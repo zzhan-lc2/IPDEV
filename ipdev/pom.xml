@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ipdev</groupId>
+  <artifactId>ipdev</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>IPDEV</name>
+  <description>Parent aggregator project </description>
+  <modules>
+  	<module>ip-commons</module>
+  	<module>ip-cnipr</module>
+  </modules>
+</project>
