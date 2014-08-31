@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+  
+   <import resource="classpath:ipdev-common.spring.xml" />
+       
+  <!-- Enable @Transactional and automatically start transaction for all classes in com.ipdev.db.manager package -->
+  <tx:annotation-driven transaction-manager="transactionManager" order="200" />
+ 
+  <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+    <tx:method name="*" />
+    </tx:attributes>
+  </tx:advice>
+  
+  <aop:config>
+    <aop:pointcut id="managers" expression="execution(* com.ipdev.db.manager..*(..)) &amp;&amp; !execution(* com.ipdev.db.manager.cache..*(..))" />
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="managers" />
+  </aop:config>
+
+  <!-- Enable @AspectJ support -->
+  <aop:aspectj-autoproxy />   
+  <aop:config proxy-target-class="true"/>  	
+           
+  <!-- ===============================================================================  -->
+  <!--   Database  (TODO: modify the following attributes by using correct data)                                                                                                 -->
+  <!-- =============================================================================== -->
+  
+  <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+    <property name="jdbcUrl" value="jdbc:mysql://localhost:8806/ipdev" />
+    <property name="driverClass" value="com.mysql.jdbc.Driver" />
+    <property name="maxIdleTime" value="180" />
+    <property name="minPoolSize" value="2" />
+    <property name="maxPoolSize" value="50" />    
+    <property name="idleConnectionTestPeriod" value="30"/>
+    <property name="preferredTestQuery" value="select 1 from dual"/>
+    <property name="initialPoolSize" value="2" />
+    <property name="maxConnectionAge" value="300" />
+    <property name="acquireRetryAttempts" value="0" />
+    <property name="acquireRetryDelay" value="1000" />
+    <property name="maxStatementsPerConnection" value="50" />        
+    <property name="user" value="ipdev" />
+    <property name="password" value="yuyangip" />
+  </bean>
+      
+  <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+	
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" >
+	<property name="dataSource" ref="dataSource" /> 
+    <property name="configLocation" value="classpath:hibernate.cfg.xml" />
+    <property name="hibernateProperties">
+      <props>      
+        <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+        <prop key="hibernate.show_sql">true</prop>
+        <prop key="hibernate.format_sql">true</prop>
+        <prop key="hibernate.use_sql_comments">true</prop>
+        <prop key="hibernate.generate_statistics">false</prop>
+        <prop key="hibernate.bytecode.use_reflection_optimizer">false</prop>
+        <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate3.SpringSessionContext</prop>
+      </props>
+    </property>
+    <property name="exposeTransactionAwareSessionFactory" value="false" />
+    <property name="mappingLocations">
+        <list>
+            <value>classpath:com/ipdev/db/support/mapping/*.hbm.xml</value>
+        </list>
+    </property>
+  </bean>
+    
+  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+    <property name="sessionFactory" ref="sessionFactory" />
+    <property name="globalRollbackOnParticipationFailure" value="false" />
+  </bean>
+  
+  <bean id="newTxTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+    <property name="transactionManager" ref="transactionManager" />
+    <property name="propagationBehavior" value="3"/>
+    <!-- 3 represents PropagationBehaviour constant PROPAGATION_REQUIRES_NEW -->
+  </bean>
+    
+  <bean id="databaseInitializer" class="com.ipdev.db.support.DatabaseInitializer" init-method="init" lazy-init="true">
+    <constructor-arg ref="&amp;sessionFactory" />
+    <property name="createSchema" value="false" /> <!-- set to "true" for unit tests -->
+    <property name="createEntities" value="false" />
+    <property name="createFunctions" value="false" />
+  </bean>
+  
+</beans>

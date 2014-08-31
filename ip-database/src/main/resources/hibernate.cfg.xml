@@ -1,0 +1,29 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+  "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+  "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+  <session-factory>
+
+    <!-- Enable 2nd-level Caching -->
+    <!-- NOTE: Using net.sf EhCache Cache provider, instead of the built-in 1.2 org.hibernate.cache.EhCacheProvider.         -->
+    <!--       This allows use of later EhCache versions with support for multiple independent EhCaches and JMX integration. -->
+    
+    <property name="hibernate.cache.use_second_level_cache">true</property>
+    <property name="hibernate.cache.use_query_cache">true</property>
+    <property name="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</property>
+    <property name="net.sf.ehcache.configurationResourceName">ehcache-hibernate.xml</property>
+
+    <!-- Enable batching -->
+    <property name="hibernate.jdbc.batch_size">500</property>
+    <property name="hibernate.jdbc.batch_versioned_data">true</property>
+    <property name="hibernate.order_inserts">true</property>
+    <property name="hibernate.order_updates">true</property>
+    
+
+    <!-- Entity Caching -->
+    <!-- NOTE: If an entity is *ever* written (or even created!), it cannot use a read-only cache.                           -->
+    
+  </session-factory>
+
+</hibernate-configuration>

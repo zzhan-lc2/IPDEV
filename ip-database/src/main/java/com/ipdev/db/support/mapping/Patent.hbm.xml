@@ -1,0 +1,59 @@
+<?xml version='1.0'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.ipdev.common.entity.patent.Patent" schema="ipdev" table="CNIPR_PATENT">
+        <id name="pid" column="PID" type="string" />
+        
+        <property name="sourceDb" column="SOURCE_DB" not-null="true" />
+        <property name="sysId" column="SYSID" />
+        <property name="title" column="TITLE" />
+        <property name="ipcs" column="IPCS" />
+        <property name="appNumber" column="APP_NUMBER" />
+        <property name="pubNumber" column="PUB_NUMBER" />
+        <property name="appDate" column="APP_DATE" />
+        <property name="pubDate" column="PUB_DATE" />
+        <property name="agencyName" column="AGENCY_NAME" />
+        <property name="agentNames" column="AGENT_NAMES" />
+        <property name="addrProvince" column="ADDR_PROVINCE" />
+        <property name="addrCity" column="ADDR_CITY" />
+        <property name="addrCounty" column="ADDR_COUNTY" />
+        <property name="address" column="ADDRESS" />
+        <property name="patType" column="PATENT_TYPE" />
+        <property name="iapp" column="IAPP" />
+        <property name="ipub" column="IPUB" />
+        <property name="den" column="DEN" />
+        <property name="abs" column="ABS" type="text" />
+        <property name="lprs" column="LPRS" />
+        <property name="draws" column="draws_apperance" />
+        <property name="applicantNames" column="APPLICANT_NAMES" />
+        <property name="inventorNames" column="INVENTOR_NAMES" />
+        <property name="prioritys" column="PRIORITY" />
+        <property name="priorityDate" column="PRIORITY_DATE" />
+        <property name="family" column="FAMILY" type="text" />
+        <property name="tifDistributePath" column="TIF_DISTRIBUTE_PATH" />
+        <property name="pages" column="PAGES" />
+        <property name="relevance" column="RELEVANCE" />
+        <property name="gazettePath" column="GAZETTE_PATH" />
+        <property name="gazettePage" column="GAZETTE_PAGE" />
+        <property name="proCode" column="PRO_CODE" />
+        <property name="appCoun" column="APP_COUNTRY" />
+        <property name="cl" column="CL" type="text" />
+        <property name="patentWords" column="PATENT_WORDS" />
+        <property name="autoAbs" column="AUTO_ABS" type="text" />
+        <property name="claimsPath" column="CLAIMS_PATH" type="text" />
+        <property name="instrPath" column="INSTR_PATH" type="text" />
+        <property name="instrTif" column="INSTR_TIF" />
+        <property name="censor" column="CENSOR" />
+        <property name="refDoc" column="REF_DOC" type="text" />
+        <property name="issueDate" column="ISSUE_DATE" />
+        <property name="initMainIpc" column="INIT_MAIN_IPC" /> 
+        <property name="initIpc" column="INIT_IPC" /> 
+        <property name="divideInitAppNo" column="DIVIDE_INIT_APP_NO" />
+                
+        <property name="creationDate" column="CREATION_DATE" not-null="true" />
+        <property name="lastUpdatedDate" column="LAST_UPDATED_DATE" />
+    </class>
+</hibernate-mapping>
