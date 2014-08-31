@@ -12,6 +12,8 @@ import org.testng.annotations.Test;
 import com.ipdev.cnipr.architect.IntegrationTestCniprCase;
 import com.ipdev.cnipr.entity.method.Cf1Request;
 import com.ipdev.cnipr.entity.method.Cf1Response;
+import com.ipdev.cnipr.entity.method.Cf2Request;
+import com.ipdev.cnipr.entity.method.Cf2Response;
 import com.ipdev.cnipr.entity.method.If1Request;
 import com.ipdev.cnipr.entity.method.If2Request;
 import com.ipdev.cnipr.entity.method.IfxResponse;
@@ -25,94 +27,95 @@ import com.ipdev.cnipr.entity.method.Sf4Request;
 import com.ipdev.cnipr.entity.method.Sf4Response;
 import com.ipdev.cnipr.entity.method.Sf9Request;
 import com.ipdev.cnipr.entity.method.Sf9Response;
+import com.ipdev.cnipr.query.AttrField;
+import com.ipdev.cnipr.utility.JsonCniprHelper;
 import com.ipdev.common.entity.method.RequestResponse;
 
-@Test(groups = {"integration"})
+@Test(groups = { "integration" })
 public class IntegrationTest_PatentSearchByCNIPRDao extends IntegrationTestCniprCase {
 
-	PatentSearchByCNIPRDao dao;
-	
-	@BeforeMethod
+    PatentSearchByCNIPRDao dao;
+
+    @BeforeMethod
     public void init() throws Exception {
-		dao = new PatentSearchByCNIPRDao(false);
-		dao.setTokenManager(tokenManager);
-		
-		recorder.setJsonHelper(dao.getJsonHelper());
-	}
-	
-	public void test_if1_getRootByIpc() {
-		BufferedWriter outputWriter = null;
+        dao = this.getBean(PatentSearchByCNIPRDao.class);
+
+        recorder.setJsonHelper(this.getBean(JsonCniprHelper.class));
+    }
+
+    public void test_if1_getRootByIpc() {
+        BufferedWriter outputWriter = null;
         try {
             outputWriter = createTempOutputFile("getRootByIpc.json");
-        
+
             If1Request request = new If1Request();
-                
+
             IfxResponse response = dao.getRootByIpc(request);
             RequestResponse rr = new RequestResponse("getRootByIpc", request, response);
-            recorder.record(outputWriter, rr, /*outputNulls=*/true);
+            recorder.record(outputWriter, rr, /* outputNulls= */true);
         } catch (Exception e) {
             System.err.println("Caught exception:" + e);
         } finally {
             IOUtils.closeQuietly(outputWriter);
         }
-	}
-	
-	public void test_if2_getChildrenByIpc() {
-		
-		BufferedWriter outputWriter = null;
+    }
+
+    public void test_if2_getChildrenByIpc() {
+
+        BufferedWriter outputWriter = null;
         try {
             outputWriter = createTempOutputFile("getChildrenByIpc.json");
-        
+
             If2Request request = new If2Request();
             request.setKey("A");
-                
+
             IfxResponse response = dao.getChildrenByIpc(request);
             RequestResponse rr = new RequestResponse("getChildrenByIpc", request, response);
-            recorder.record(outputWriter, rr, /*outputNulls=*/true);
+            recorder.record(outputWriter, rr, /* outputNulls= */true);
         } catch (Exception e) {
             System.err.println("Caught exception:" + e);
         } finally {
             IOUtils.closeQuietly(outputWriter);
         }
-	}
-	
-	public void test_sf1_absSearchByExpression() throws IOException {		
-		BufferedWriter outputWriter = createTempOutputFile("absSearchByExpression.json");
-		try {
+    }
+
+    public void test_sf1_absSearchByExpression() throws IOException {
+        BufferedWriter outputWriter = createTempOutputFile("absSearchByExpression.json");
+        try {
             String expression = "名称=（手机）";
             int maxResults = 1000;
-			Sf1Request request = new Sf1Request();
-			request.setExpression(expression);
-			request.addDb("FMZL");
-			request.addDb("SYXX");
-			request.addDb("WGZL");
-			request.addDb("FMSQ");
+            Sf1Request request = new Sf1Request();
+            request.setExpression(expression);
+            request.addDb("FMZL");
+            request.addDb("SYXX");
+            request.addDb("WGZL");
+            request.addDb("FMSQ");
             request.setOrderBy("申请日", false);
-		
-			int step = 50;
-			int count = 0;
-			while (count<maxResults) {
-				request.setFrom(count);
-				request.setTo(count+step);
-				Sf1Response response = dao.absSearchByExpression(request);
-				
-				RequestResponse rr = new RequestResponse("absSearchByExpression", request, response);
-				recorder.record(outputWriter, rr, /*outputNulls=*/false);
-				
-				int res_size = response.getResults()==null ? 0 : response.getResults().size();
-				if (res_size<step) {
-					// no more data
-					break;
-				}
-				count += res_size;
-			}
-		} catch (Exception e) {
-			System.err.println("Caught exception:" + e);
-		} finally {
-			IOUtils.closeQuietly(outputWriter);
-		}
-	}
-	
+
+            int step = 50;
+            int count = 0;
+            while (count < maxResults) {
+                request.setFrom(count);
+                request.setTo(count + step);
+                Sf1Response response = dao.absSearchByExpression(request);
+
+                RequestResponse rr = new RequestResponse("absSearchByExpression", request, response);
+                recorder.record(outputWriter, rr, /* outputNulls= */false);
+
+                int res_size = response.getResults() == null ? 0 : response.getResults().size();
+                if (res_size < step) {
+                    // no more data
+                    break;
+                }
+                count += res_size;
+            }
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
+
     /*
      * 常用检索字段: 名称 申请号 申请日 申请（专利权）人 摘要 公开（公告）号 公开（公告）日 发明（设计）人 最新法律状态 分类号 代理人 专利代理机构
      */
@@ -187,103 +190,165 @@ public class IntegrationTest_PatentSearchByCNIPRDao extends IntegrationTestCnipr
         }
     }
 
-	public void test_sf2_detailSearchByPid() throws IOException {
-		List<String> ids = Arrays.asList("FMZL@CN103730938A", "FMZL@CN103677896A", "FMZL@CN103731526A");
-		
-		BufferedWriter outputWriter = null;
-		try {
-			outputWriter = createTempOutputFile("patentDetail.json");
-			
-			for (String pid : ids) {
-				Sf2Request request = new Sf2Request();
-				request.setPid(pid);
-				
-				Sf2Response response = dao.detailSearchByPid(request);
-				RequestResponse rr = new RequestResponse("detailSearchByPid", request, response);
-				recorder.record(outputWriter, rr, /*outputNulls=*/true);
-			}
-		} catch (Exception e) {
-			System.err.println("Caught exception:" + e);
-		} finally {
-			IOUtils.closeQuietly(outputWriter);
-		}
-	}
-	
-	public void test_sf3_prsSearch() {
-		BufferedWriter outputWriter = null;
-		try {
-			outputWriter = createTempOutputFile("prsSearchResults.json");
-		
-			Sf3Request request = new Sf3Request();
+    public void test_sf2_detailSearchByPid() throws IOException {
+        List<String> ids = Arrays.asList("FMZL@CN103730938A", "FMZL@CN103677896A", "FMZL@CN103731526A");
+
+        BufferedWriter outputWriter = null;
+        try {
+            outputWriter = createTempOutputFile("patentDetail.json");
+
+            for (String pid : ids) {
+                Sf2Request request = new Sf2Request();
+                request.setPid(pid);
+
+                Sf2Response response = dao.detailSearchByPid(request);
+                RequestResponse rr = new RequestResponse("detailSearchByPid", request, response);
+                recorder.record(outputWriter, rr, /* outputNulls= */true);
+            }
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
+
+    public void test_sf3_prsSearch() {
+        BufferedWriter outputWriter = null;
+        try {
+            outputWriter = createTempOutputFile("prsSearchResults.json");
+
+            Sf3Request request = new Sf3Request();
             request.setExpression("申请号=CN2014%");
-				
-			Sf3Response response = dao.prsSearch(request);
-			RequestResponse rr = new RequestResponse("prsSearch", request, response);
-			recorder.record(outputWriter, rr, /*outputNulls=*/true);
-		} catch (Exception e) {
-			System.err.println("Caught exception:" + e);
-		} finally {
-			IOUtils.closeQuietly(outputWriter);
-		}
-	}
-	
-	public void test_sf4_prsDetailSearch() {
-		List<String> appns = Arrays.asList("CN201420006273.2", "CN201420014852.1", "CN201410007755.4");
-		
-		BufferedWriter outputWriter = null;
-		try {
-			outputWriter = createTempOutputFile("prsDetailSearchResults.json");
-		
-			for (String an : appns) {
-				Sf4Request request = new Sf4Request();
-				request.setAppnumber(an);
-					
-				Sf4Response response = dao.prsDetailSearch(request);
-				RequestResponse rr = new RequestResponse("prsDetailSearch", request, response);
-				recorder.record(outputWriter, rr, /*outputNulls=*/true);
-			}
-		} catch (Exception e) {
-			System.err.println("Caught exception:" + e);
-		} finally {
-			IOUtils.closeQuietly(outputWriter);
-		}
-	}
-	
-	public void test_sf9_patentTransferSearch() {
-		BufferedWriter outputWriter = null;
-		try {
-			outputWriter = createTempOutputFile("patentTransferSearchResults.json");
-		
-			Sf9Request request = new Sf9Request();
+
+            Sf3Response response = dao.prsSearch(request);
+            RequestResponse rr = new RequestResponse("prsSearch", request, response);
+            recorder.record(outputWriter, rr, /* outputNulls= */true);
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
+
+    public void test_sf4_prsDetailSearch() {
+        List<String> appns = Arrays.asList("CN201420006273.2", "CN201420014852.1", "CN201410007755.4");
+
+        BufferedWriter outputWriter = null;
+        try {
+            outputWriter = createTempOutputFile("prsDetailSearchResults.json");
+
+            for (String an : appns) {
+                Sf4Request request = new Sf4Request();
+                request.setAppnumber(an);
+
+                Sf4Response response = dao.prsDetailSearch(request);
+                RequestResponse rr = new RequestResponse("prsDetailSearch", request, response);
+                recorder.record(outputWriter, rr, /* outputNulls= */true);
+            }
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
+
+    public void test_sf9_patentTransferSearch() {
+        BufferedWriter outputWriter = null;
+        try {
+            outputWriter = createTempOutputFile("patentTransferSearchResults.json");
+
+            Sf9Request request = new Sf9Request();
             request.setExpression("申请号=CN2013%");
-				
-			Sf9Response response = dao.patentTransferRecordsSearch(request);
-			RequestResponse rr = new RequestResponse("patentTransferRecordsSearch", request, response);
-			recorder.record(outputWriter, rr, /*outputNulls=*/true);
-		} catch (Exception e) {
-			System.err.println("Caught exception:" + e);
-		} finally {
-			IOUtils.closeQuietly(outputWriter);
-		}
-	}
-	
-	public void test_cf1_getNoCodeCorpByKey() {
-		BufferedWriter outputWriter = null;
-		try {
-			outputWriter = createTempOutputFile("noCodeCorpByKeyResults.json");
-		
-			Cf1Request request = new Cf1Request();
-			request.setKey("SKF");
-			request.setFrom(0);
-			request.setTo(50);
-				
-			Cf1Response response = dao.getNoCodeCorpByKey(request);
-			RequestResponse rr = new RequestResponse("getNoCodeCorpByKey", request, response);
-			recorder.record(outputWriter, rr, /*outputNulls=*/true);
-		} catch (Exception e) {
-			System.err.println("Caught exception:" + e);
-		} finally {
-			IOUtils.closeQuietly(outputWriter);
-		}
-	}
+
+            Sf9Response response = dao.patentTransferRecordsSearch(request);
+            RequestResponse rr = new RequestResponse("patentTransferRecordsSearch", request, response);
+            recorder.record(outputWriter, rr, /* outputNulls= */true);
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
+
+    public void test_cf1_getNoCodeCorpByKey() {
+        BufferedWriter outputWriter = null;
+        String key = "SKF";
+        try {
+            outputWriter = createTempOutputFile("noCodeCorpByKeyResults-" + key + ".json");
+
+            Cf1Request request = new Cf1Request();
+            request.setKey(key);
+            request.setFrom(0);
+            request.setTo(50);
+
+            Cf1Response response = dao.getNoCodeCorpByKey(request);
+            RequestResponse rr = new RequestResponse("getNoCodeCorpByKey", request, response);
+            recorder.record(outputWriter, rr, /* outputNulls= */true);
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
+
+    public void test_cf2_gtRootCorpByKey() {
+        BufferedWriter outputWriter = null;
+        String key = "富士康";
+        try {
+            outputWriter = createTempOutputFile("rootCorpByKeyResults-" + key + ".json");
+
+            Cf2Request request = new Cf2Request();
+            request.setKey(key);
+            request.setFrom(0);
+            request.setTo(50);
+
+            Cf2Response response = dao.getRootCorpByKey(request);
+            RequestResponse rr = new RequestResponse("getRootCorpByKey", request, response);
+            recorder.record(outputWriter, rr, /* outputNulls= */true);
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
+
+    public void test_sf1_absSearchByCorp() {
+        String corpCode = "无锡市雷华科技有限公司"; // "富士康";
+        BufferedWriter outputWriter = null;
+        try {
+            outputWriter = createTempOutputFile("absSearchByCorp-" + corpCode + ".json");
+
+            String expression = AttrField.APPLICANT + "=" + corpCode;
+            int maxResults = 1000;
+            Sf1Request request = new Sf1Request();
+            request.setExpression(expression);
+            request.addDb("FMZL");
+            request.addDb("SYXX");
+            request.addDb("WGZL");
+            request.addDb("FMSQ");
+            request.setOrderBy("申请日", false);
+
+            int step = 50;
+            int count = 0;
+            while (count < maxResults) {
+                request.setFrom(count);
+                request.setTo(count + step);
+                Sf1Response response = dao.absSearchByExpression(request);
+
+                RequestResponse rr = new RequestResponse("absSearchByExpression", request, response);
+                recorder.record(outputWriter, rr, /* outputNulls= */false);
+
+                int res_size = response.getResults() == null ? 0 : response.getResults().size();
+                if (res_size < step) {
+                    // no more data
+                    break;
+                }
+                count += res_size;
+            }
+        } catch (Exception e) {
+            System.err.println("Caught exception:" + e);
+        } finally {
+            IOUtils.closeQuietly(outputWriter);
+        }
+    }
 }

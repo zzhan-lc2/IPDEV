@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 import com.ipdev.cnipr.dao.patent.PatentSearchByCNIPRDao;
@@ -15,16 +16,17 @@ import com.ipdev.cnipr.entity.patent.IpcInfoNode;
 
 public class IPCManagerImpl implements IPCManager {
 
+    @Autowired
     PatentSearchByCNIPRDao cniprDao;
 
-    public void setCniprDao(PatentSearchByCNIPRDao cniprDao) {
-        this.cniprDao = cniprDao;
+    public PatentSearchByCNIPRDao getCniprDao() {
+        return this.cniprDao;
     }
 
     @Override
     public List<IpcInfoNode> getIpcTreeByKey(String ipcKey, int maxNodes) {
         List<IpcInfoNode> results = Lists.newArrayList();
-        
+
         IfxResponse response = null;
         if (StringUtils.isEmpty(ipcKey)) {
             If1Request request = new If1Request();

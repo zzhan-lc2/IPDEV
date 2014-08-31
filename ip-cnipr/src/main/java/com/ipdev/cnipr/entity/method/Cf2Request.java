@@ -15,7 +15,7 @@ public class Cf2Request extends CniprRequest {
 	private int to = 49;
 
 	public Cf2Request() {
-		super("corpCode/cf2", CallType.GET, Cf1Response.class);
+		super("corpCode/cf2", CallType.GET, Cf2Response.class);
 		this.setMethodDescription("根据关键词-查询有代码的公司的根结点信息接口");
 	}
 

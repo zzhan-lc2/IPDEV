@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.ipdev</groupId>
     <artifactId>ipdev</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>ip-cnipr</artifactId>
   <name>ip-cnipr</name>
@@ -21,7 +21,7 @@
     <dependency>
         <groupId>com.ipdev</groupId>
     	<artifactId>ip-commons</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
+    	<version>0.1.0-SNAPSHOT</version>
     </dependency>
 	<dependency>
       <groupId>com.google.oauth-client</groupId>

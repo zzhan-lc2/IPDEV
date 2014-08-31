@@ -9,8 +9,8 @@ import com.ipdev.common.datatype.DateRange;
 import com.ipdev.common.entity.patent.Patent;
 
 public interface PatentManager {
-
-    Integer getPatentCountsByDbPubDate(CNIPRDBS db, DateRange pubDateRange);
+    
+    Integer getPatentCountsByDbDateRange(CNIPRDBS db, AttrField dateField, DateRange dateRange);
 
     Integer getPatentCounts(List<CNIPRDBS> dbList, ExpUnit searchExpressions);
 
