@@ -4,13 +4,18 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.google.common.collect.Lists;
+import com.ipdev.common.entity.Constants;
 
 public class Patent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String pid; // 专利信息id
+    private String sourceDb; // 来源数据库，参照CNIPR的文档
     private String sysId;
     private List<String> ipc; // 分类号
     private String title; // 名称
@@ -20,7 +25,7 @@ public class Patent implements Serializable {
     private Date pubDate; // 公开（公告）日
     private String agencyName; // 专利代理机构
     private List<String> agentName; // 代理人
-    private String addProvince;
+    private String addrProvince;
     private String addrCity;
     private String addrCounty;
     private String address;
@@ -32,9 +37,10 @@ public class Patent implements Serializable {
     private String lprs; // 最新法律状态
     private String draws; // 摘要附图存储路径: 外观专利，无摘要附图，此字段无意义
     private List<String> applicantName; // 申请（专利权）人
-    private List<String> inventroName; // 发明（设计）人
+    private List<String> inventorName; // 发明（设计）人
     private List<String> priority; // 优先权
     private List<String> family; // 优同族专利项权
+    private Date priorityDate; // 优先权日
     private String tifDistributePath; // 发布路径, 全文图片
     private Integer pages; // 对应tifDistributePath的图片张数
     private String relevance; // 相似度
@@ -58,12 +64,24 @@ public class Patent implements Serializable {
     private String initIpc; // 本国分类号
     private String divideInitAppNo; // 分案原申请号
 
+    // Auditing columns
+    private Date creationDate;
+    private Date lastUpdatedDate;
+
     public String getPid() {
         return pid;
     }
 
     public void setPid(String pid) {
         this.pid = pid;
+    }
+
+    public void setSourceDb(String sourceDb) {
+        this.sourceDb = sourceDb;
+    }
+
+    public String getSourceDb() {
+        return this.sourceDb;
     }
 
     public String getSysId() {
@@ -88,6 +106,21 @@ public class Patent implements Serializable {
 
     public void setIpc(List<String> ipc) {
         this.ipc = ipc;
+    }
+
+    /**
+     * Return the single string for the list of IPCs.
+     * 
+     * @return the IPCs in one string
+     */
+    public String getIpcs() {
+        return StringUtils.join(this.ipc, Constants.LIST_ELEMENT_SEPARATOR);
+    }
+
+    public void setIpcs(String ipcs) {
+        if (StringUtils.isBlank(ipcs))
+            return;
+        this.ipc = Lists.newArrayList(StringUtils.split(ipcs, Constants.LIST_ELEMENT_SEPARATOR));
     }
 
     public Date getAppDate() {
@@ -130,12 +163,12 @@ public class Patent implements Serializable {
         this.agencyName = agencyName;
     }
 
-    public String getAddProvince() {
-        return addProvince;
+    public String getAddrProvince() {
+        return addrProvince;
     }
 
-    public void setAddProvince(String addProvince) {
-        this.addProvince = addProvince;
+    public void setAddrProvince(String addProvince) {
+        this.addrProvince = addProvince;
     }
 
     public String getAddrCity() {
@@ -226,12 +259,45 @@ public class Patent implements Serializable {
         this.applicantName = applicantName;
     }
 
-    public List<String> getInventroName() {
-        return inventroName;
+    public String getApplicantNames() {
+        return StringUtils.join(this.applicantName, Constants.LIST_ELEMENT_SEPARATOR);
     }
 
-    public void setInventroName(List<String> inventroName) {
-        this.inventroName = inventroName;
+    public void setApplicantNames(String applicantNames) {
+        if (StringUtils.isBlank(applicantNames))
+            return;
+
+        this.applicantName = Lists.newArrayList(StringUtils.split(applicantNames, Constants.LIST_ELEMENT_SEPARATOR));
+    }
+
+    public List<String> getInventorName() {
+        return inventorName;
+    }
+
+    public void setInventorName(List<String> inventorName) {
+        this.inventorName = inventorName;
+    }
+
+    public String getInventorNames() {
+        return StringUtils.join(this.inventorName, Constants.LIST_ELEMENT_SEPARATOR);
+    }
+
+    public void setInventorNames(String inventorNames) {
+        if (StringUtils.isBlank(inventorNames))
+            return;
+
+        this.inventorName = Lists.newArrayList(StringUtils.split(inventorNames, Constants.LIST_ELEMENT_SEPARATOR));
+    }
+
+    public String getPrioritys() {
+        return StringUtils.join(this.priority, Constants.LIST_ELEMENT_SEPARATOR);
+    }
+
+    public void setPrioritys(String prioritys) {
+        if (StringUtils.isBlank(prioritys))
+            return;
+
+        this.priority = Lists.newArrayList(StringUtils.split(prioritys, Constants.LIST_ELEMENT_SEPARATOR));
     }
 
     public List<String> getPriority() {
@@ -242,6 +308,14 @@ public class Patent implements Serializable {
         this.priority = priority;
     }
 
+    public Date getPriorityDate() {
+        return priorityDate;
+    }
+
+    public void setPriorityDate(Date priorityDate) {
+        this.priorityDate = priorityDate;
+    }
+
     public List<String> getFamily() {
         return family;
     }
@@ -250,12 +324,32 @@ public class Patent implements Serializable {
         this.family = family;
     }
 
+    public String getFamilys() {
+        return StringUtils.join(this.family, Constants.LIST_ELEMENT_SEPARATOR);
+    }
+
+    public void setFamilys(String familys) {
+        if (StringUtils.isBlank(familys))
+            return;
+        this.family = Lists.newArrayList(StringUtils.split(familys, Constants.LIST_ELEMENT_SEPARATOR));
+    }
+
     public List<String> getAgentName() {
         return agentName;
     }
 
     public void setAgentName(List<String> agentName) {
         this.agentName = agentName;
+    }
+
+    public String getAgentNames() {
+        return StringUtils.join(this.agentName, Constants.LIST_ELEMENT_SEPARATOR);
+    }
+
+    public void setAgentNames(String agentNames) {
+        if (StringUtils.isBlank(agentNames))
+            return;
+        this.agentName = Lists.newArrayList(StringUtils.split(agentNames, Constants.LIST_ELEMENT_SEPARATOR));
     }
 
     public String getTifDistributePath() {
@@ -416,6 +510,33 @@ public class Patent implements Serializable {
 
     public void setDivideInitAppNo(String divideInitAppNo) {
         this.divideInitAppNo = divideInitAppNo;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Date getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
+    public void setLastUpdatedDate(Date lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof Patent))
+            return false;
+        Patent other = (Patent) obj;
+
+        return StringUtils.equalsIgnoreCase(this.getPid(), other.getPid());
     }
 
     @Override

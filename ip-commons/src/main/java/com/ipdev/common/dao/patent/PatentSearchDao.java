@@ -6,9 +6,7 @@ import java.util.Set;
 
 import com.ipdev.common.entity.patent.Patent;
 
-public interface PatentSearchDao {
-
-    Patent findDetailPatentById(String id);
+public interface PatentSearchDao extends PatentSimpleSearchDao {
 
     List<Patent> findPatentsByApplicant(String applicantName, Set<String> sourceDbs);
 

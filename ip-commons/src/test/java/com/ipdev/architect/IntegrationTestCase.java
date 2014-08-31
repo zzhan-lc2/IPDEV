@@ -23,6 +23,7 @@ public abstract class IntegrationTestCase {
     protected IntegrationTestCase(String[] springResources) {
         context = new ClassPathXmlApplicationContext(
             springResources);
+        SpringContextTestSupport.initialize("ipdev-cnipr-test", springResources);
     }
 
     protected void setTestFolder(String testFolder) {
@@ -44,4 +45,13 @@ public abstract class IntegrationTestCase {
         }
 
     }
+
+    protected <T> T getBean(Class<T> clazz) {
+        return SpringContextTestSupport.getBean(clazz);
+    }
+
+    protected <T> T getBean(String beanName, Class<T> clazz) {
+        return SpringContextTestSupport.getBean(beanName, clazz);
+    }
+
 }
