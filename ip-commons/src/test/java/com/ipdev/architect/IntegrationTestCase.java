@@ -8,11 +8,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.ipdev.architect.AppConfig.Domain;
+
 public abstract class IntegrationTestCase {
     static String[] springConfigResources = {
         "ipdev-common.spring.xml"
     };
 
+    public Domain domain = Domain.TEST;
     ApplicationContext context;
     String testFolder = System.getProperty("java.io.tmpdir");
 
@@ -21,9 +24,14 @@ public abstract class IntegrationTestCase {
     }
 
     protected IntegrationTestCase(String[] springResources) {
+        AppConfig.setDomain(domain);
         context = new ClassPathXmlApplicationContext(
             springResources);
         SpringContextTestSupport.initialize("ipdev-cnipr-test", springResources);
+    }
+
+    protected void setDomain(Domain domain) {
+        this.domain = domain;
     }
 
     protected void setTestFolder(String testFolder) {
