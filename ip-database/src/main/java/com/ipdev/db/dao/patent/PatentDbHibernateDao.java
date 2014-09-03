@@ -1,5 +1,6 @@
 package com.ipdev.db.dao.patent;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,12 @@ import com.ipdev.db.support.AbstractHibernateDao;
 
 @SuppressWarnings("unchecked")
 public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implements PatentStorageDao, PatentSearchDao {
+
+    public void save(Patent patent) {
+        Preconditions.checkNotNull(patent, "patent cannot be null");
+
+        super.save(sanitize(patent));
+    }
 
     public List<Patent> generalSearch(Map<String, String> searchParams) {
         // TODO Auto-generated method stub
@@ -36,6 +43,16 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         }
 
         return query.list();
+    }
+
+    Patent sanitize(Patent entity) {
+        if (entity.getCreationDate() == null) {
+            entity.setCreationDate(new Date());
+        }
+        if (entity.getLastUpdatedDate() == null) {
+            entity.setLastUpdatedDate(new Date());
+        }
+        return entity;
     }
 
 }

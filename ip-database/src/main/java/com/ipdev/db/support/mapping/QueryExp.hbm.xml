@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.ipdev.common.query.QueryExp" schema="ipdev" table="SYNC_CNIPR_QUERY_EXP">
+        <id name="id" column="expression_id" >
+			<generator class="increment"/>
+		</id>
+		<many-to-one name="parent" column="QUERY_IDF" class="com.ipdev.common.query.Query" not-null="true" />
+        
+        <property name="expKey" column="EXP_KEY" not-null="true" />
+        <property name="expValue" column="EXP_VALUE" />
+        <property name="operator" column="OPERATOR" />
+	</class>
+</hibernate-mapping>
