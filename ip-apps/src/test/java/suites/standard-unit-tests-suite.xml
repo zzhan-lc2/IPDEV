@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="StandardUnitTestSuite" thread-count="1">
+    <test name="IPDEVAppUnitTests" verbose="2">
+        <groups>
+            <run>
+                <include name="support"/>
+                <include name="unit"/>
+                
+                <exclude name="skip"/>
+                <exclude name="broken"/>
+            </run>
+        </groups>
+        
+        <packages>
+            <package name="com.ipdev.apps.*"/>
+        </packages>
+    </test>
+</suite>
