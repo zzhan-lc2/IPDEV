@@ -6,6 +6,7 @@
             <run>
                 <include name="support"/>
                 <include name="unit"/>
+                <include name="dao"/>
                 
                 <exclude name="skip"/>
                 <exclude name="broken"/>

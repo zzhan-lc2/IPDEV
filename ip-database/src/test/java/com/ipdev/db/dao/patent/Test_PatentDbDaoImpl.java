@@ -1,10 +1,9 @@
 package com.ipdev.db.dao.patent;
 
-import java.text.ParseException;
-import java.util.Date;
+import static com.ipdev.db.support.DateTestUtils.parseDate;
+
 import java.util.List;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -17,8 +16,6 @@ import com.ipdev.db.support.HibernateDaoUnitTestCase;
 
 @Test(groups = { "unit", "dao" }, singleThreaded = true)
 public class Test_PatentDbDaoImpl extends HibernateDaoUnitTestCase {
-
-    static final String DATE_PATTERN = "yyyy-MM-dd";
 
     @CreateDao(PatentDbHibernateDao.class)
     private PatentDbHibernateDao dao;
@@ -86,11 +83,4 @@ public class Test_PatentDbDaoImpl extends HibernateDaoUnitTestCase {
         Assert.assertEquals(actual.get(0), patent2);
     }
 
-    static Date parseDate(String date_yyyy_MM_dd) {
-        try {
-            return DateUtils.parseDate(date_yyyy_MM_dd, DATE_PATTERN);
-        } catch (ParseException e) {
-            return null;
-        }
-    }
 }

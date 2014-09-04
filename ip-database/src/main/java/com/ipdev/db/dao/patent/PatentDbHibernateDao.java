@@ -2,7 +2,6 @@ package com.ipdev.db.dao.patent;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.ipdev.common.dao.patent.PatentSearchDao;
 import com.ipdev.common.dao.patent.PatentStorageDao;
 import com.ipdev.common.entity.patent.Patent;
+import com.ipdev.common.query.Query;
 import com.ipdev.db.support.AbstractHibernateDao;
 
 @SuppressWarnings("unchecked")
@@ -24,8 +24,9 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         super.save(sanitize(patent));
     }
 
-    public List<Patent> generalSearch(Map<String, String> searchParams) {
-        // TODO Auto-generated method stub
+    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs) {
+        Preconditions.checkNotNull(query, "query cannot be null");
+        // TODO
         return null;
     }
 
