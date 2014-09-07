@@ -14,6 +14,14 @@ public class QueryExp implements Serializable {
     private String expValue;
     private Operator operator;
 
+    public QueryExp() {
+    }
+
+    public QueryExp(String key, String value) {
+        this.expKey = key;
+        this.expValue = value;
+    }
+
     public Query getParent() {
         return parent;
     }

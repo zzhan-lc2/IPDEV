@@ -11,7 +11,7 @@
     
   <!-- beans -->
   
-  <bean id="cniprTokenManager" class="com.ipdev.cnipr.dao.patent.AuthTokenManager" />
+  <bean id="cniprTokenManager" class="com.ipdev.cnipr.auth.AuthTokenManager" />
   
   <bean id="cniprJsonHelper" class="com.ipdev.cnipr.utility.JsonCniprHelper" />
   
@@ -20,13 +20,13 @@
   </bean>
   
   <bean id="patentCniprDao" class="com.ipdev.cnipr.dao.patent.PatentSearchByCNIPRDao" >
-      <property name="isProd" value="true" /> <!-- set to false for testing -->
       <property name="httpUtil" ref="httpMethodsCnipr" />
       <property name="tokenManager" ref="cniprTokenManager" />
       <property name="jsonHelper" ref="cniprJsonHelper" />
   </bean>
  
   <bean id="imageCniprHandler" class="com.ipdev.cnipr.dao.patent.ImageCniprHandler" >
+      <property name="tokenManager" ref="cniprTokenManager" />
       <property name="httpUtil" ref="httpMethodsCnipr" />
   </bean>
 </beans>

@@ -15,7 +15,7 @@
   <aop:aspectj-autoproxy />   
   <aop:config proxy-target-class="true"/>  	
     
-  <!-- TODO: add beans -->
+  <!-- TODO: add beans -->  
   <bean id="jsonFileRecorder" class="com.ipdev.common.recorder.JsonFileDataRecorder" />
   
 </beans>

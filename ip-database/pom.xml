@@ -40,10 +40,22 @@
 	
     <dependency>
 		<groupId>org.hibernate</groupId>
-		<artifactId>hibernate</artifactId>
-		<version>3.2.7.ga</version>
+		<artifactId>hibernate-core</artifactId>
+		<version>${hibernate.version}</version>
 	</dependency>
 	
+    <dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-ehcache</artifactId>
+		<version>${hibernate.version}</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-c3p0</artifactId>
+		<version>${hibernate.version}</version>
+	</dependency>
+
     <dependency>
 		<groupId>javax.transaction</groupId>
 		<artifactId>jta</artifactId>
@@ -73,5 +85,6 @@
   
   <properties>
   	<spring.version>4.0.2.RELEASE</spring.version>
+  	<hibernate.version>4.3.6.Final</hibernate.version>
   </properties>
 </project>

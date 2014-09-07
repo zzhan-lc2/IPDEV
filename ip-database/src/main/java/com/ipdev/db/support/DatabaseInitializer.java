@@ -1,8 +1,5 @@
 package com.ipdev.db.support;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +11,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-
-import com.ipdev.common.UnrecoverablePersistenceException;
 
 public class DatabaseInitializer {
     private final Log log = LogFactory.getLog(DatabaseInitializer.class);
@@ -80,22 +75,21 @@ public class DatabaseInitializer {
         log.info("Creating schema for the database " + databaseName);
 
         Session session = sessionFactory.openSession();
-        Connection connection = session.connection();
         try {
             if (StringUtils.isNotEmpty(schemaName)) {
                 String schemaCommand = "CREATE SCHEMA IF NOT EXISTS " + schemaName;
-                executeStatement(connection, schemaCommand);
+                HibernateUtil.executeStatement(session, schemaCommand);
             }
 
             for (String seq : this.sequenceList) {
                 String seqCommand = "CREATE SEQUENCE IF NOT EXISTS " + seq;
-                executeStatement(connection, seqCommand);
+                HibernateUtil.executeStatement(session, seqCommand);
             }
 
             boolean isPrintingEnabled = true; // false;
             boolean isExecutionEnabled = true;
 
-            SchemaExport schemaExport = new SchemaExport(configuration, connection);
+            SchemaExport schemaExport = new SchemaExport(configuration); // connection);
             schemaExport.create(isPrintingEnabled, isExecutionEnabled);
         } finally {
             session.close();
@@ -115,14 +109,4 @@ public class DatabaseInitializer {
          */
     }
 
-    protected final void executeStatement(Connection connection, String command)
-        throws UnrecoverablePersistenceException {
-        try {
-            Statement statement = connection.createStatement();
-            statement.execute(command);
-            statement.close();
-        } catch (SQLException ex) {
-            throw new UnrecoverablePersistenceException("The SQL command '" + command + "' failed.", ex);
-        }
-    }
 }

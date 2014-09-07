@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.jdbc.Work;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import com.ipdev.common.UnrecoverablePersistenceException;
@@ -32,16 +32,15 @@ public class HibernateUtil {
         }
     }
 
-    public static long generateNextSequenceValue(Session session, String sequenceName) {
-        Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
-        String sql = dialect.getSequenceNextValString(sequenceName);
-
-        Query query = session.createSQLQuery(sql);
-        long result = ((Number) query.uniqueResult()).longValue();
-
-        return result;
-    }
-
+    /*
+     * public static long generateNextSequenceValue(Session session, String sequenceName) { Dialect dialect =
+     * ((SessionFactoryImplementor) session.getSessionFactory()).getDialect(); String sql =
+     * dialect.getSequenceNextValString(sequenceName);
+     * 
+     * Query query = session.createSQLQuery(sql); long result = ((Number) query.uniqueResult()).longValue();
+     * 
+     * return result; }
+     */
     public static String getJdbcUrl(SessionFactory sessionFactory, Configuration configuration) {
         if (StringUtils.isNotEmpty(configuration.getProperty("hibernate.connection.url"))) {
             return configuration.getProperty("hibernate.connection.url");
@@ -69,14 +68,25 @@ public class HibernateUtil {
         }
     }
 
+    public static void executeStatement(Session session, final String command) {
+        session.doWork(
+            new Work() {
+                public void execute(Connection connection) throws SQLException {
+                    Statement statement = connection.createStatement();
+                    statement.execute(command);
+                    statement.close();
+                }
+            }
+            );
+    }
+
     @SuppressWarnings("deprecation")
     public static void executeStatements(SessionFactory sessionFactory, String... commands)
         throws UnrecoverablePersistenceException {
         Session session = sessionFactory.openSession();
-        Connection connection = session.connection();
         try {
             for (String command : commands) {
-                executeStatement(connection, command);
+                executeStatement(session, command);
             }
         } finally {
             session.close();

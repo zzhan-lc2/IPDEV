@@ -1,5 +1,6 @@
 package com.ipdev.common.utility.file;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -16,9 +17,14 @@ public class PatentFileUtility {
         Preconditions.checkNotNull(patent, "patent cannot be null");
         Preconditions.checkNotNull(baseLocation, "baseLocation cannot be null");
 
-        String pid = patent.getPid();
+        return patentPidToFolderPath(baseLocation, patent.getPid(), patent.getSourceDb(), fileExtension);
+    }
 
-        String path = patentPidToFolderPath(pid, patent.getSourceDb());
+    public static URI patentPidToFolderPath(URI baseLocation, String pid, String sourceDb, String fileExtension) {
+        Preconditions.checkNotNull(pid, "pid cannot be null");
+        Preconditions.checkNotNull(baseLocation, "baseLocation cannot be null");
+
+        String path = patentPidToFolderPath(pid, sourceDb);
 
         int index = StringUtils.indexOf(pid, "@");
         if (index > 0) {
@@ -30,7 +36,7 @@ public class PatentFileUtility {
             .append(path)
             .append(pid).append(fileExtension);
 
-        return new URI(sb.toString());
+        return new File(sb.toString()).toURI();
     }
 
     public static String patentPidToFolderPath(String pid, String sourceDb) {

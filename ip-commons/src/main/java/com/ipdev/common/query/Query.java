@@ -1,7 +1,6 @@
 package com.ipdev.common.query;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,17 +9,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Lists;
+import com.ipdev.common.entity.AuditableEntity;
 
-public class Query implements Serializable {
+public class Query extends AuditableEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String id;
-    private Date creationDate;
     private String creator;
     private QueryType queryType;
     private List<QueryExp> expressions = Lists.newArrayList();
     private Boolean isDeprecated;
-    private Date lastUpdatedDate;
 
     public String getId() {
         return id;
@@ -28,14 +26,6 @@ public class Query implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
     }
 
     public String getCreator() {
@@ -68,14 +58,6 @@ public class Query implements Serializable {
         }
         exp.setParent(this);
         this.expressions.add(exp);
-    }
-
-    public Date getLastUpdatedDate() {
-        return lastUpdatedDate;
-    }
-
-    public void setLastUpdatedDate(Date lastUpdatedDate) {
-        this.lastUpdatedDate = lastUpdatedDate;
     }
 
     public Boolean getIsDeprecated() {

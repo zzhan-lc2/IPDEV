@@ -1,4 +1,4 @@
-package com.ipdev.cnipr.dao.patent;
+package com.ipdev.cnipr.auth;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -5,10 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.function.StandardSQLFunction;
 
 public class InMemoryPersistenceContext extends AbstractPersistenceContext {
 
@@ -69,7 +67,7 @@ public class InMemoryPersistenceContext extends AbstractPersistenceContext {
 
         initConfigExtra(configuration);
 
-        configuration.addSqlFunction("trunc", new StandardSQLFunction("trunc", Hibernate.DATE));
+        // configuration.addSqlFunction("trunc", new StandardSQLFunction("trunc", Hibernate.DATE));
     }
 
     protected void initConfigExtra(Configuration configuration) {

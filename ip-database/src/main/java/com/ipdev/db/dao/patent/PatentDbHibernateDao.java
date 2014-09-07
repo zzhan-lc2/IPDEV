@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.ipdev.common.dao.patent.PatentSearchDao;
 import com.ipdev.common.dao.patent.PatentStorageDao;
 import com.ipdev.common.entity.patent.Patent;
+import com.ipdev.common.query.OrderExp;
 import com.ipdev.common.query.Query;
 import com.ipdev.db.support.AbstractHibernateDao;
 
@@ -24,7 +25,7 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         super.save(sanitize(patent));
     }
 
-    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs) {
+    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs, OrderExp orderExp) {
         Preconditions.checkNotNull(query, "query cannot be null");
         // TODO
         return null;

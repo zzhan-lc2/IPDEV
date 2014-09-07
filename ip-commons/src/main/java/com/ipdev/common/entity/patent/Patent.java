@@ -9,9 +9,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.collect.Lists;
+import com.ipdev.common.entity.AuditableEntity;
 import com.ipdev.common.entity.Constants;
 
-public class Patent implements Serializable {
+public class Patent extends AuditableEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String pid; // 专利信息id
@@ -63,10 +64,6 @@ public class Patent implements Serializable {
     private String initMainIpc; // 本国主分类号
     private String initIpc; // 本国分类号
     private String divideInitAppNo; // 分案原申请号
-
-    // Auditing columns
-    private Date creationDate;
-    private Date lastUpdatedDate;
 
     public String getPid() {
         return pid;
@@ -510,22 +507,6 @@ public class Patent implements Serializable {
 
     public void setDivideInitAppNo(String divideInitAppNo) {
         this.divideInitAppNo = divideInitAppNo;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public Date getLastUpdatedDate() {
-        return lastUpdatedDate;
-    }
-
-    public void setLastUpdatedDate(Date lastUpdatedDate) {
-        this.lastUpdatedDate = lastUpdatedDate;
     }
 
     @Override

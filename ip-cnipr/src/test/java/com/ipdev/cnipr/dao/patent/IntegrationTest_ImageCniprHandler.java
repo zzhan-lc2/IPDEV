@@ -19,9 +19,8 @@ public class IntegrationTest_ImageCniprHandler extends IntegrationTestCniprCase 
 
     @BeforeMethod
     public void init() {
-        handler = new ImageCniprHandler();
+        handler = this.getBean(ImageCniprHandler.class);
 
-        handler.setTokenManager(tokenManager);
     }
 
     public void test_downloadDraws() {
@@ -43,11 +42,11 @@ public class IntegrationTest_ImageCniprHandler extends IntegrationTestCniprCase 
     }
 
     public void test_downloadTiffs() {
-
+        // TODO
     }
 
     public void test_downloadThumbnails() {
-
+        // TODO
     }
 
 }

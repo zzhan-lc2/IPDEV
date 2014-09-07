@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
+import com.ipdev.cnipr.auth.AuthTokenManager;
 import com.ipdev.common.IpdException;
 import com.ipdev.common.dao.patent.ImageHandler;
 import com.ipdev.common.net.HttpMethodsInterface;

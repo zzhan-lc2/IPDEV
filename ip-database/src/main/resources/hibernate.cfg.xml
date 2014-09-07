@@ -11,8 +11,12 @@
     
     <property name="hibernate.cache.use_second_level_cache">true</property>
     <property name="hibernate.cache.use_query_cache">true</property>
-    <property name="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</property>
-    <property name="net.sf.ehcache.configurationResourceName">ehcache-hibernate.xml</property>
+    <property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+    <property name="hibernate.cache.provider_configuration_file_resource_path">ehcache-hibernate.xml</property>
+    <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</property>
+    <property name="hibernate.cache.use_query_cache">true</property>
+	<property name="hibernate.generate_statistics">true</property>
+	<property name="hibernate.cache.use_structured_entries">true</property> 
 
     <!-- Enable batching -->
     <property name="hibernate.jdbc.batch_size">500</property>

@@ -1,8 +1,12 @@
 package com.ipdev.cnipr.entity.patent;
 
 import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public enum CNIPRDBS {
     FMZL("CN", "中国发明专利"),
@@ -35,11 +39,11 @@ public enum CNIPRDBS {
 
     String countryCode;
     String description;
+    static Set<String> names_ = null;
 
     private CNIPRDBS(String countryCode, String description) {
         this.countryCode = countryCode;
         this.description = description;
-
     }
 
     public String getCountryCode() {
@@ -62,5 +66,19 @@ public enum CNIPRDBS {
             }
         }
         return results;
+    }
+
+    public static boolean isValid(String dbStr) {
+        return getNames().contains(StringUtils.upperCase(dbStr));
+    }
+
+    public static Set<String> getNames() {
+        if (names_ == null) {
+            names_ = Sets.newHashSet();
+            for (CNIPRDBS db : CNIPRDBS.values()) {
+                names_.add(db.name());
+            }
+        }
+        return names_;
     }
 }
