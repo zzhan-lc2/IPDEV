@@ -6,9 +6,13 @@
     <import resource="classpath:ipdev-cnipr.spring.xml" />
     <import resource="classpath:ipdev-db.spring.xml" />
     
+    <bean id="patentFileStorageDao" class="com.ipdev.common.dao.patent.PatentStorageFileDao" >
+        <property name="baseLocation" value="D:\\Temp\\cnipr" /> <!-- replace this with real production setting -->
+    </bean>
+    
     <bean id="cniprSyncApp" class="com.ipdev.apps.patent.CniprPatentSyncApp">
         <property name="cniprDao" ref="patentCniprDao" />
-        <property name="localSearchDao" ref="" />
-        <property name="storageDao" ref="" />
+        <property name="localSearchDao" ref="patentFileStorageDao" />
+        <property name="storageDao" ref="patentFileStorageDao" />
     </bean>
 </beans>

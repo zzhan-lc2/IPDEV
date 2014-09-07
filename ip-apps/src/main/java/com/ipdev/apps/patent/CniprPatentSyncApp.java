@@ -40,7 +40,9 @@ public class CniprPatentSyncApp extends IpAppBase {
     }
 
     public void addSourceDb(String sourceDb) {
-        this.sourceDbs.add(sourceDb);
+        Preconditions.checkNotNull(sourceDb, "sourceDb cannot be null");
+
+        this.sourceDbs.add(sourceDb.toUpperCase());
     }
 
     public int syncPatentsByUser(String user) {
@@ -71,7 +73,7 @@ public class CniprPatentSyncApp extends IpAppBase {
 
         LOG.info("Sync patents from CNIPR for query=[{}]", query);
 
-        List<Patent> patents = cniprDao.findPatentsByQuery(query, sourceDbs);
+        List<Patent> patents = cniprDao.findPatentsByQuery(query, sourceDbs, null);
         if (CollectionUtils.isEmpty(patents)) {
             LOG.info("No patent found from CNIPR");
             return 0;
@@ -96,6 +98,10 @@ public class CniprPatentSyncApp extends IpAppBase {
     }
 
     public static void main(String[] args) {
+        IpAppBase.configure(args, "CniprPatentSync");
+
+        CniprPatentSyncApp app = IpAppBase.getApplication(CniprPatentSyncApp.class);
+
         // TODO
     }
 }
