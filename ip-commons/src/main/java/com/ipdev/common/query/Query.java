@@ -44,6 +44,14 @@ public class Query extends AuditableEntity implements Serializable {
         this.queryType = queryType;
     }
 
+    public Integer getQueryTypeValue() {
+        return this.queryType == null ? null : queryType.getValue();
+    }
+
+    public void setQueryTypeValue(Integer value) {
+        this.queryType = QueryType.getByValue(value);
+    }
+
     public List<QueryExp> getExpressions() {
         return expressions;
     }

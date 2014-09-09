@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Preconditions;
 import com.ipdev.common.dao.query.QueryDao;
@@ -13,6 +14,7 @@ import com.ipdev.db.support.AbstractHibernateDao;
 
 public class QueryDbHibernateDao extends AbstractHibernateDao<Query> implements QueryDao {
 
+    @Transactional
     public void save(Query query) {
         Preconditions.checkNotNull(query, "query cannot be null");
 

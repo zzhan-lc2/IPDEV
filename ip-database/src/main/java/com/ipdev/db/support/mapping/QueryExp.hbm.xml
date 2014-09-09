@@ -4,11 +4,11 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="com.ipdev.common.query.QueryExp" schema="ipdev" table="SYNC_CNIPR_QUERY_EXP">
+    <class name="com.ipdev.common.query.QueryExp" schema="ipdev" table="SYN_CNIPR_QUERY_EXPRESSION">
         <id name="id" column="expression_id" >
 			<generator class="increment"/>
 		</id>
-		<many-to-one name="parent" column="QUERY_IDF" class="com.ipdev.common.query.Query" not-null="true" />
+		<many-to-one name="parent" column="QUERY_ID" class="com.ipdev.common.query.Query" not-null="true" />
         
         <property name="expKey" column="EXP_KEY" not-null="true" />
         <property name="expValue" column="EXP_VALUE" />

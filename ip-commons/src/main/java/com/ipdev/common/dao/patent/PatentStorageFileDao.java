@@ -83,7 +83,6 @@ public class PatentStorageFileDao extends JsonFileDataRecorder implements Patent
             String jsonStr = FileUtils.readFileToString(new File(path), DEFAULT_CHARSET);
             return this.getJsonHelper().fromJsonString(jsonStr, Patent.class);
         } catch (Exception e) {
-            LOG.warn("Caught Exception when reading file:" + path, e);
             return null;
         }
 

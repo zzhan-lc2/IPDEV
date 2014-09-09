@@ -64,7 +64,7 @@
         <prop key="hibernate.use_sql_comments">true</prop>
         <prop key="hibernate.generate_statistics">false</prop>
         <prop key="hibernate.bytecode.use_reflection_optimizer">false</prop>
-        <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate3.SpringSessionContext</prop>
+        <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
       </props>
     </property>
     <!-- 
@@ -94,5 +94,8 @@
     <property name="createEntities" value="false" />
     <property name="createFunctions" value="false" />
   </bean>
+  
+  <!-- DB related DAO -->
+  <bean id="queryDbDao" class="com.ipdev.db.dao.query.QueryDbHibernateDao" depends-on="sessionFactory" />
   
 </beans>
