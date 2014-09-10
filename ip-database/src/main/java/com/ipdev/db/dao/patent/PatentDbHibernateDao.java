@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Preconditions;
 import com.ipdev.common.dao.patent.PatentSearchDao;
@@ -17,6 +18,7 @@ import com.ipdev.common.query.Query;
 import com.ipdev.db.support.AbstractHibernateDao;
 
 @SuppressWarnings("unchecked")
+@Transactional
 public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implements PatentStorageDao, PatentSearchDao {
 
     public void save(Patent patent) {
@@ -51,9 +53,7 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         if (entity.getCreationDate() == null) {
             entity.setCreationDate(new Date());
         }
-        if (entity.getLastUpdatedDate() == null) {
-            entity.setLastUpdatedDate(new Date());
-        }
+        entity.setLastUpdatedDate(new Date());
         return entity;
     }
 

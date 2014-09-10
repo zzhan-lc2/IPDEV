@@ -97,5 +97,6 @@
   
   <!-- DB related DAO -->
   <bean id="queryDbDao" class="com.ipdev.db.dao.query.QueryDbHibernateDao" depends-on="sessionFactory" />
+  <bean id="patentDbDao" class="com.ipdev.db.dao.patent.PatentDbHibernateDao" depends-on="sessionFactory" />
   
 </beans>

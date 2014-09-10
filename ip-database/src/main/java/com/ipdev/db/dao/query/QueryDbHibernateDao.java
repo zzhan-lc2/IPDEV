@@ -12,9 +12,9 @@ import com.ipdev.common.dao.query.QueryDao;
 import com.ipdev.common.query.Query;
 import com.ipdev.db.support.AbstractHibernateDao;
 
+@Transactional
 public class QueryDbHibernateDao extends AbstractHibernateDao<Query> implements QueryDao {
 
-    @Transactional
     public void save(Query query) {
         Preconditions.checkNotNull(query, "query cannot be null");
 

@@ -27,17 +27,18 @@
         <property name="den" column="DEN" />
         <property name="abs" column="ABS" type="text" />
         <property name="lprs" column="LPRS" />
-        <property name="draws" column="draws_apperance" />
+        <property name="draws" column="DRAWS_APPEARANCE" />
         <property name="applicantNames" column="APPLICANT_NAMES" />
         <property name="inventorNames" column="INVENTOR_NAMES" />
-        <property name="prioritys" column="PRIORITY" />
+        <property name="prioritys" column="PRIORITYS" />
         <property name="priorityDate" column="PRIORITY_DATE" />
-        <property name="family" column="FAMILY" type="text" />
+        <property name="familys" column="FAMILY" type="text" />
         <property name="tifDistributePath" column="TIF_DISTRIBUTE_PATH" />
         <property name="pages" column="PAGES" />
         <property name="relevance" column="RELEVANCE" />
         <property name="gazettePath" column="GAZETTE_PATH" />
         <property name="gazettePage" column="GAZETTE_PAGE" />
+        <property name="gazetteCount" column="GAZETTE_COUNT" />
         <property name="proCode" column="PRO_CODE" />
         <property name="appCoun" column="APP_COUNTRY" />
         <property name="cl" column="CL" type="text" />
