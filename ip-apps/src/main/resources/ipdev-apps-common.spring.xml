@@ -13,6 +13,7 @@
     <bean id="cniprSyncApp" class="com.ipdev.apps.patent.CniprPatentSyncApp">
         <property name="cniprDao" ref="patentCniprDao" />
         <property name="localSearchDao" ref="patentDbDao" />
-        <property name="storageDao" ref="patentDbDao" /> <!-- patentFileStorageDao -->
+        <property name="dbStorageDao" ref="patentDbDao" />
+        <property name="fileStorageDao" ref="patentFileStorageDao" />
     </bean>
 </beans>
