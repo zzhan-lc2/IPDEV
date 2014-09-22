@@ -43,6 +43,7 @@ import com.ipdev.cnipr.entity.method.Sf9Request;
 import com.ipdev.cnipr.entity.method.Sf9Response;
 import com.ipdev.cnipr.entity.method.Tf1Request;
 import com.ipdev.cnipr.entity.method.Tf1Response;
+import com.ipdev.common.DaoException;
 import com.ipdev.common.auth.AuthToken;
 import com.ipdev.common.auth.AuthTokenExpireException;
 import com.ipdev.common.net.HttpMethodsInterface;
@@ -54,6 +55,7 @@ public class CniprAPIDao {
     HttpMethodsInterface httpUtil;
     JsonHelper jsonHelper;
     AuthTokenManager tokenManager;
+    int maxRetries = 4;
 
     String getApiUrl() {
         return OAuth2ClientCredentials.getApiURL(AppConfig.getDomain());
@@ -153,10 +155,19 @@ public class CniprAPIDao {
         return (Tf1Response) cniprSearch(request);
     }
 
-    static final String ACCESS_TOKEN_INVALID_MSG = "access_token无效";
-
     CniprResponse<?> cniprSearch(CniprRequest request) {
+        return cniprSearch(request, 0);
+    }
+
+    static final String ACCESS_TOKEN_INVALID_MSG = "请求失败：access_token";
+
+    CniprResponse<?> cniprSearch(CniprRequest request, int retryCounter) {
         Preconditions.checkNotNull(request, "request cannot be null");
+        if (retryCounter >= maxRetries) {
+            LOG.error("Reach maximum retry times:" + this.maxRetries);
+            throw new DaoException("Reach retry limit");
+        }
+
         String url = getApiUrl() + request.getMethod() + "/" + OAuth2ClientCredentials.API_KEY;
 
         List<NameValuePair> nvps = Lists.newArrayList();
@@ -170,15 +181,19 @@ public class CniprAPIDao {
             responseStr = httpUtil.get(url, nvps);
         }
         if (LOG.isDebugEnabled()) {
+            LOG.debug("CNIPR search Url: " + url);
             LOG.debug("CNIPR search response = " + responseStr);
         }
         if (StringUtils.isEmpty(responseStr)) {
             return null;
         }
         if (responseStr.contains(ACCESS_TOKEN_INVALID_MSG)) {
-            throw new AuthTokenExpireException(responseStr);
+            // at least retry once
+            this.tokenManager.handleTokenExpireException(new AuthTokenExpireException(responseStr));
+            // TODO: add support for various back-off strategy: linear or exponential
+            return cniprSearch(request, retryCounter++);
+        } else {
+            return jsonHelper.fromJsonString(responseStr, request.getResponseType());
         }
-
-        return jsonHelper.fromJsonString(responseStr, request.getResponseType());
     }
 }

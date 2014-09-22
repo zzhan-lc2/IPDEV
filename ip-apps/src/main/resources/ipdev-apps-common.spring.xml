@@ -10,10 +10,14 @@
         <property name="baseLocation" value="D:\\Temp\\cnipr" /> <!-- replace this with real production setting -->
     </bean>
     
-    <bean id="cniprSyncApp" class="com.ipdev.apps.patent.CniprPatentSyncApp">
+    <bean id="cniprPatentSyncManager" class="com.ipdev.apps.manager.PatentsCniprSyncManager">
         <property name="cniprDao" ref="patentCniprDao" />
         <property name="localSearchDao" ref="patentDbDao" />
         <property name="dbStorageDao" ref="patentDbDao" />
         <property name="fileStorageDao" ref="patentFileStorageDao" />
+    </bean>
+    
+    <bean id="cniprSyncApp" class="com.ipdev.apps.patent.CniprPatentSyncApp">
+        <property name="patentSyncManager" ref="cniprPatentSyncManager" />
     </bean>
 </beans>

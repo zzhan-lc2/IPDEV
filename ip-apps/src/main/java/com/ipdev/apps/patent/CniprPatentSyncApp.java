@@ -2,8 +2,6 @@ package com.ipdev.apps.patent;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -13,124 +11,52 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.ipdev.apps.IpAppBase;
-import com.ipdev.cnipr.dao.patent.PatentSearchByCNIPRDao;
-import com.ipdev.common.dao.patent.PatentSimpleSearchDao;
-import com.ipdev.common.dao.patent.PatentStorageDao;
-import com.ipdev.common.dao.patent.PatentStorageFileDao;
-import com.ipdev.common.dao.query.QueryDao;
-import com.ipdev.common.entity.patent.Patent;
-import com.ipdev.common.query.Query;
+import com.ipdev.common.manager.PatentSyncManager;
+import com.ipdev.common.manager.RequestControlParams;
 
 public class CniprPatentSyncApp extends IpAppBase {
     @Nonnull
-    PatentSearchByCNIPRDao cniprDao;
-    PatentSimpleSearchDao localSearchDao;
-    PatentStorageFileDao fileStorageDao;
-    PatentStorageDao dbStorageDao;
-    boolean enableFileStorage = false;
+    PatentSyncManager syncManager;
 
-    QueryDao queryDao;
-    Set<String> sourceDbs = Sets.newHashSet();
+    final RequestControlParams controlParams = new RequestControlParams();
 
-    public void setCniprDao(PatentSearchByCNIPRDao cniprDao) {
-        this.cniprDao = cniprDao;
+    public void setForceUpdate(boolean forceUpdate) {
+        controlParams.withForceUpdate(forceUpdate);
     }
 
-    public void setLocalSearchDao(PatentSimpleSearchDao localSearchDao) {
-        this.localSearchDao = localSearchDao;
+    public void setMaxReturns(int maxReturns) {
+        controlParams.withMaxResults(maxReturns);
     }
 
-    public void setQueryDao(QueryDao queryDao) {
-        this.queryDao = queryDao;
-    }
-
-    public void setFileStorageDao(PatentStorageFileDao storageDao) {
-        this.fileStorageDao = storageDao;
-    }
-
-    public void setDbStorageDao(PatentStorageDao dbStorageDao) {
-        this.dbStorageDao = dbStorageDao;
+    public void setPatentSyncManager(PatentSyncManager syncManager) {
+        this.syncManager = syncManager;
     }
 
     public void setFileBaseFolder(String baseFolder) {
-        Preconditions.checkState(fileStorageDao != null, "fileStorageDao cannot be null");
-        this.fileStorageDao.setBaseLocation(baseFolder);
-        this.enableFileStorage = true;
+        controlParams.withFileBaseDir(baseFolder);
+        controlParams.withEnableFileStorage(true);
     }
 
     public void setSourceDbs(String sourceDbs) {
         Preconditions.checkNotNull(sourceDbs, "sourceDbs cannot be null");
 
         for (String db : StringUtils.split(sourceDbs, ",")) {
-            this.addSourceDb(db);
+            controlParams.addSourceDb(db);
         }
     }
 
     public void addSourceDb(String sourceDb) {
         Preconditions.checkNotNull(sourceDb, "sourceDb cannot be null");
 
-        this.sourceDbs.add(sourceDb.toUpperCase());
+        controlParams.addSourceDb(sourceDb.toUpperCase());
     }
 
-    public int syncPatentsByUser(String user) {
-        Preconditions.checkNotNull(user, "user cannot be null");
-
-        LOG.info("Starting to sync patents from CNIPR for user: " + user);
-
-        int numbChanged = 0;
-
-        // 1. find number of queries belonged to this user
-        List<Query> queries = queryDao.findByCreator(user);
-        if (CollectionUtils.isEmpty(queries)) {
-            LOG.info("No query found for this user");
-            return 0;
-        }
-
-        // 2. for each query, sync the db with CNIPR
-        for (Query query : queries) {
-            numbChanged += this.syncPatentsByQuery(query);
-        }
-
-        LOG.info("Total patents sync from CNIPR to local storage = {}", numbChanged);
-        return numbChanged;
-    }
-
-    int syncPatentsByQuery(Query query) {
-        int numbChanged = 0;
-
-        LOG.info("Sync patents from CNIPR for query=[{}]", query);
-
-        List<Patent> patents = cniprDao.findPatentsByQuery(query, sourceDbs, null);
-        if (CollectionUtils.isEmpty(patents)) {
-            LOG.info("No patent found from CNIPR");
-            return 0;
-        }
-
-        // for each patent id, check if our DB already has it (TODO: we might still need to update it if there's status
-        // change in Patent detail)
-        for (Patent patent : patents) {
-            Patent db = this.localSearchDao.findPatentById(patent.getPid());
-            if (db != null) {
-                // TODO: we might still need to update it if there's status change in Patent detail
-                continue;
-            }
-
-            patent = cniprDao.findPatentById(patent.getPid());
-            if (this.enableFileStorage) {
-                this.fileStorageDao.save(patent);
-            }
-            this.dbStorageDao.save(patent);
-            numbChanged++;
-        }
-        LOG.info("Number of patents sync from CNIPR to local storage = {}", numbChanged);
-
-        return numbChanged;
+    int syncPatentsByUser(String user) {
+        return syncManager.syncPatentsByUser(user, controlParams);
     }
 
     public static void main(String[] args) {
@@ -149,6 +75,9 @@ public class CniprPatentSyncApp extends IpAppBase {
             }
             if (cmd.hasOption("d")) {
                 app.setSourceDbs(cmd.getOptionValue("d"));
+            }
+            if (cmd.hasOption("x")) {
+                app.setMaxReturns(Integer.parseInt(cmd.getOptionValue("x")));
             }
             if (!cmd.hasOption("u")) {
                 printUsage("CniprPatentSyncApp", options, System.out);
@@ -169,6 +98,7 @@ public class CniprPatentSyncApp extends IpAppBase {
         options.addOption("b", true, "(optional) base directory for JSON output file");
         options.addOption("u", true, "the user name (i.e the name for the IP applicant)");
         options.addOption("d", true, "(optional) the source databases (separated by [,])");
+        options.addOption("x", true, "(optional) the maximum returns for each search");
 
         return options;
     }

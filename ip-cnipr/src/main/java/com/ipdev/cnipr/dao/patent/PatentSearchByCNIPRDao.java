@@ -26,12 +26,12 @@ import com.ipdev.common.query.QueryExp;
 public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchDao {
     static final Log LOG = LogFactory.getLog(PatentSearchByCNIPRDao.class);
 
-    static int MAX_RETURN_PATENTS = 5000; // we do not want to overwhelm the memory resource
+    // static int MAX_RETURN_PATENTS = 5000; // we do not want to overwhelm the memory resource
 
     public PatentSearchByCNIPRDao() {
     }
 
-    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs, OrderExp orderExp) {
+    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs, OrderExp orderExp, int maxReturns) {
         Preconditions.checkNotNull(query, "query cannot be null");
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(query.getExpressions()),
             "Expressions in Query cannot be empty");
@@ -59,7 +59,11 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
 
         int step = 50;
         int count = 0;
-        while (count < MAX_RETURN_PATENTS) {
+        while (true) {
+            if (maxReturns > 0 && count >= maxReturns) {
+                break;
+            }
+
             request.setFrom(count);
             request.setTo(count + step);
             Sf1Response response = this.absSearchByExpression(request);
@@ -68,9 +72,12 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
             if (res_size > 0) {
                 patents.addAll(response.getResults());
 
-                if (count == 0 && response.getTotal() > MAX_RETURN_PATENTS) {
-                    LOG.warn("The total result of this query (" + response.getTotal()
-                        + ") is more than the maximum allowed return number: " + MAX_RETURN_PATENTS);
+                if (count == 0) {
+                    LOG.info("The total result of this query = " + response.getTotal());
+                    if (maxReturns > 0 && (response.getTotal() > maxReturns)) {
+                        LOG.warn("The total result of this query (" + response.getTotal()
+                            + ") is more than the maximum allowed return number: " + maxReturns);
+                    }
                 }
             }
             if (res_size < step) {
@@ -115,7 +122,7 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
         return null;
     }
 
-    public List<Patent> findPatentsByApplicant(String applicantName, Set<String> sourceDbs) {
+    public List<Patent> findPatentsByApplicant(String applicantName, Set<String> sourceDbs, int maxReturns) {
         Preconditions.checkNotNull(applicantName, "applicantName cannot be null");
 
         Query query = new Query();
@@ -123,6 +130,6 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
         exp.setExpKey(AttrField.APPLICANT.getName());
         exp.setExpValue(applicantName);
         query.addExpression(exp);
-        return this.findPatentsByQuery(query, sourceDbs, null);
+        return this.findPatentsByQuery(query, sourceDbs, null, maxReturns);
     }
 }

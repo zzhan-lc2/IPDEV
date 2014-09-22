@@ -27,7 +27,7 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         super.save(sanitize(patent));
     }
 
-    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs, OrderExp orderExp) {
+    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs, OrderExp orderExp, int maxReturns) {
         Preconditions.checkNotNull(query, "query cannot be null");
         // TODO
         return null;
@@ -37,13 +37,16 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         return this.findById(Patent.class, id);
     }
 
-    public List<Patent> findPatentsByApplicant(String applicantName, Set<String> sourceDbs) {
+    public List<Patent> findPatentsByApplicant(String applicantName, Set<String> sourceDbs, int maxReturns) {
         Preconditions.checkNotNull(applicantName, "applicantName cannot be null");
 
         Criteria query = this.createCriteria(Patent.class)
             .add(Restrictions.like("applicantNames", "%" + applicantName + "%"));
         if (CollectionUtils.isNotEmpty(sourceDbs)) {
             query.add(Restrictions.in("sourceDb", sourceDbs));
+        }
+        if (maxReturns > 0) {
+            query.setMaxResults(maxReturns);
         }
 
         return query.list();

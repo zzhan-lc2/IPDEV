@@ -70,15 +70,16 @@ public class Test_PatentDbDaoImpl extends HibernateDaoUnitTestCase {
 
     @Test(dependsOnMethods = "test_save")
     public void test_findPatentsByApplicant() {
+        int maxReturns = 0;
         String applicantName = "Applicant2";
-        List<Patent> actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */null);
+        List<Patent> actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */null, maxReturns);
         Assert.assertEquals(actual.size(), 1);
 
-        actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */Sets.newHashSet("SRCDB2"));
+        actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */Sets.newHashSet("SRCDB2"), maxReturns);
         Assert.assertEquals(actual.size(), 0);
 
         applicantName = "Applicant3";
-        actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */null);
+        actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */null, maxReturns);
         Assert.assertEquals(actual.size(), 1);
         Assert.assertEquals(actual.get(0), patent2);
     }

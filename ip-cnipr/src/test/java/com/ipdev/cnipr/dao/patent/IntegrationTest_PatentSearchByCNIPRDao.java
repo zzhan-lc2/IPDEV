@@ -49,7 +49,7 @@ public class IntegrationTest_PatentSearchByCNIPRDao extends IntegrationTestCnipr
         exp.setExpValue("20120901 to 20121002");
         query.addExpression(exp);
 
-        List<Patent> actual = dao.findPatentsByQuery(query, sourceDbs, null);
+        List<Patent> actual = dao.findPatentsByQuery(query, sourceDbs, null, 0);
         Assert.assertTrue(actual.size() > 1);
     }
 }
