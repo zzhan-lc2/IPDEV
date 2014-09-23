@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 
 import com.ipdev.apps.IntegrationTestAppCase;
 import com.ipdev.cnipr.query.AttrField;
-import com.ipdev.common.manager.RequestControlParams;
+import com.ipdev.common.dao.patent.RequestControlParams;
 import com.ipdev.common.query.Query;
 import com.ipdev.common.query.QueryExp;
 
@@ -41,17 +41,25 @@ public class IntegrationTest_PatentsCniprSyncManager extends IntegrationTestAppC
     }
 
     public void test_syncPatentsByQuery_3() { // 华为
-        params.withMaxResults(200);
+        // params.withMaxResults(200);
+
+        int pageSize = 200;
 
         Query query = new Query();
         QueryExp exp = new QueryExp(AttrField.APPLICANT.getName(), "华为技术有限公司");
         query.addExpression(exp);
 
-        try {
-            int actual = manager.syncPatentsByQuery(query, params);
-            Assert.assertTrue(actual > 1);
-        } catch (Exception e) {
-            System.err.println("Caught exception:" + e);
+        int start = 8000;
+        params.withFromIndex(start);
+        for (int i = 0; i < 10; i++) {
+            params.withFromIndex(start + i * pageSize)
+                .withToIndex(start + (i + 1) * pageSize);
+            try {
+                int actual = manager.syncPatentsByQuery(query, params);
+                Assert.assertTrue(actual > 1);
+            } catch (Exception e) {
+                System.err.println("Caught exception:" + e);
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.ipdev.common.entity.patent.Patent;
-import com.ipdev.common.query.OrderExp;
 import com.ipdev.common.query.Query;
 
 public interface PatentSearchDao extends PatentSimpleSearchDao {
@@ -14,28 +13,22 @@ public interface PatentSearchDao extends PatentSimpleSearchDao {
      * 
      * @param applicantName
      *            the patent applicant name
-     * @param sourceDbs
-     *            the set of source dbs
-     * @param maxReturns
-     *            the maximum return records (<=0 means no limit)
-     * 
+     * @param controlParams
+     *            the RequestControlParams
      * @return the list of Patents
      */
-    List<Patent> findPatentsByApplicant(String applicantName, Set<String> sourceDbs, int maxReturns);
+    List<Patent> findPatentsByApplicant(String applicantName, RequestControlParams controlParams);
 
     /**
      * Find the list of patents by our "sync" query with control parameter maxReturns (<=0 means no maximumrestriction)
      * 
      * @param query
      *            the Query
-     * @param sourceDbs
-     *            the set of source dbs
-     * @param orderExp
-     *            the order-by expression
-     * @param maxReturns
-     *            the maximum return records (<=0 means no limit)
+     * @param controlParams
+     *            the RequestControlParams
      * @return the list of Patents
      */
-    List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs, OrderExp orderExp, int maxReturns);
+    List<Patent> findPatentsByQuery(Query query, RequestControlParams controlParams);
 
+    int getTotalPatentsByQuery(Query query, Set<String> sourceDbs);
 }

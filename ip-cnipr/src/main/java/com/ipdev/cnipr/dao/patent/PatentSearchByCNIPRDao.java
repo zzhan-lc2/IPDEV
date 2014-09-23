@@ -17,8 +17,8 @@ import com.ipdev.cnipr.entity.method.Sf2Response;
 import com.ipdev.cnipr.entity.patent.CNIPRDBS;
 import com.ipdev.cnipr.query.AttrField;
 import com.ipdev.common.dao.patent.PatentSearchDao;
+import com.ipdev.common.dao.patent.RequestControlParams;
 import com.ipdev.common.entity.patent.Patent;
-import com.ipdev.common.query.OrderExp;
 import com.ipdev.common.query.OrderExp.Direction;
 import com.ipdev.common.query.Query;
 import com.ipdev.common.query.QueryExp;
@@ -31,21 +31,7 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
     public PatentSearchByCNIPRDao() {
     }
 
-    public List<Patent> findPatentsByQuery(Query query, Set<String> sourceDbs, OrderExp orderExp, int maxReturns) {
-        Preconditions.checkNotNull(query, "query cannot be null");
-        Preconditions.checkArgument(CollectionUtils.isNotEmpty(query.getExpressions()),
-            "Expressions in Query cannot be empty");
-
-        List<Patent> patents = Lists.newArrayList();
-
-        Sf1Request request = new Sf1Request();
-        if (null == orderExp) {
-            request.setOrderBy("申请日", false); // default
-        } else {
-            request.setOrderBy(orderExp.getOrderBy(), orderExp.equals(Direction.ASC) ? true : false);
-        }
-
-        request.setExpression(queryToExpression(query));
+    void addSourceDbs(Sf1Request request, Set<String> sourceDbs) {
         if (CollectionUtils.isEmpty(sourceDbs)) {
             sourceDbs = CNIPRDBS.getNames();
         }
@@ -56,35 +42,66 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
                 LOG.error("The source DB string is invalid: " + db);
             }
         }
+    }
+
+    public int getTotalPatentsByQuery(Query query, Set<String> sourceDbs) {
+        Preconditions.checkNotNull(query, "query cannot be null");
+        Preconditions.checkArgument(CollectionUtils.isNotEmpty(query.getExpressions()),
+            "Expressions in Query cannot be empty");
+
+        Sf1Request request = new Sf1Request();
+
+        request.setExpression(queryToExpression(query));
+        addSourceDbs(request, sourceDbs);
+
+        request.setFrom(0);
+        request.setTo(1);
+        Sf1Response response = this.absSearchByExpression(request);
+
+        return response.getTotal();
+    }
+
+    public List<Patent> findPatentsByQuery(Query query, RequestControlParams controlParams) {
+        Preconditions.checkNotNull(query, "query cannot be null");
+        Preconditions.checkNotNull(controlParams, "controlParams cannot be null");
+        Preconditions.checkArgument(CollectionUtils.isNotEmpty(query.getExpressions()),
+            "Expressions in Query cannot be empty");
+
+        List<Patent> patents = Lists.newArrayList();
+
+        Sf1Request request = new Sf1Request();
+        if (null == controlParams.getOrderExp()) {
+            request.setOrderBy("申请日", false); // default
+        } else {
+            request.setOrderBy(controlParams.getOrderExp().getOrderBy(), controlParams.getOrderExp().getDirection()
+                .equals(Direction.ASC) ? true : false);
+        }
+
+        request.setExpression(queryToExpression(query));
+        addSourceDbs(request, controlParams.getSourceDbs());
 
         int step = 50;
-        int count = 0;
+        int maxResults = controlParams.getToIndex() - controlParams.getFromIndex();
+        int from = controlParams.getFromIndex();
         while (true) {
-            if (maxReturns > 0 && count >= maxReturns) {
+            if (maxResults > 0 && from >= controlParams.getToIndex()) {
                 break;
             }
 
-            request.setFrom(count);
-            request.setTo(count + step);
+            request.setFrom(from);
+            request.setTo(from + step);
             Sf1Response response = this.absSearchByExpression(request);
 
             int res_size = response.getResults() == null ? 0 : response.getResults().size();
             if (res_size > 0) {
                 patents.addAll(response.getResults());
 
-                if (count == 0) {
-                    LOG.info("The total result of this query = " + response.getTotal());
-                    if (maxReturns > 0 && (response.getTotal() > maxReturns)) {
-                        LOG.warn("The total result of this query (" + response.getTotal()
-                            + ") is more than the maximum allowed return number: " + maxReturns);
-                    }
-                }
             }
             if (res_size < step) {
                 // no more data
                 break;
             }
-            count += res_size;
+            from += res_size;
         }
 
         return patents;
@@ -122,7 +139,7 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
         return null;
     }
 
-    public List<Patent> findPatentsByApplicant(String applicantName, Set<String> sourceDbs, int maxReturns) {
+    public List<Patent> findPatentsByApplicant(String applicantName, RequestControlParams controlParams) {
         Preconditions.checkNotNull(applicantName, "applicantName cannot be null");
 
         Query query = new Query();
@@ -130,6 +147,7 @@ public class PatentSearchByCNIPRDao extends CniprAPIDao implements PatentSearchD
         exp.setExpKey(AttrField.APPLICANT.getName());
         exp.setExpValue(applicantName);
         query.addExpression(exp);
-        return this.findPatentsByQuery(query, sourceDbs, null, maxReturns);
+        return this.findPatentsByQuery(query, controlParams);
     }
+
 }

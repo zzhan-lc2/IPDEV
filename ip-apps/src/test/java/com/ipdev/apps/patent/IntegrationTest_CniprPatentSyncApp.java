@@ -5,6 +5,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.ipdev.apps.IntegrationTestAppCase;
+import com.ipdev.cnipr.query.AttrField;
+import com.ipdev.common.query.Query;
+import com.ipdev.common.query.QueryExp;
 
 @Test(groups = { "integration" })
 public class IntegrationTest_CniprPatentSyncApp extends IntegrationTestAppCase {
@@ -20,4 +23,12 @@ public class IntegrationTest_CniprPatentSyncApp extends IntegrationTestAppCase {
         Assert.assertNotNull(app.syncManager);
     }
 
+    public void test_syncPatentsByQuery() {
+        Query query = new Query();
+        QueryExp exp = new QueryExp(AttrField.APPLICANT.getName(), "华为技术有限公司");
+        query.addExpression(exp);
+
+        int actual = app.syncPatentsByQuery(query);
+        Assert.assertTrue(actual > 6000);
+    }
 }

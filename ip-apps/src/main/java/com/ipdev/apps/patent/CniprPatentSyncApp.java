@@ -2,6 +2,7 @@ package com.ipdev.apps.patent;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -11,25 +12,35 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.ipdev.apps.IpAppBase;
+import com.ipdev.common.dao.patent.RequestControlParams;
+import com.ipdev.common.dao.query.QueryDao;
 import com.ipdev.common.manager.PatentSyncManager;
-import com.ipdev.common.manager.RequestControlParams;
+import com.ipdev.common.query.Query;
 
 public class CniprPatentSyncApp extends IpAppBase {
     @Nonnull
     PatentSyncManager syncManager;
+    QueryDao queryDao;
+
+    int pageSize = 200;
 
     final RequestControlParams controlParams = new RequestControlParams();
+
+    public void setQueryDao(QueryDao queryDao) {
+        this.queryDao = queryDao;
+    }
 
     public void setForceUpdate(boolean forceUpdate) {
         controlParams.withForceUpdate(forceUpdate);
     }
 
-    public void setMaxReturns(int maxReturns) {
-        controlParams.withMaxResults(maxReturns);
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
     public void setPatentSyncManager(PatentSyncManager syncManager) {
@@ -56,7 +67,33 @@ public class CniprPatentSyncApp extends IpAppBase {
     }
 
     int syncPatentsByUser(String user) {
-        return syncManager.syncPatentsByUser(user, controlParams);
+        int numbChanged = 0;
+
+        // 1. find number of queries belonged to this user
+        List<Query> queries = queryDao.findByCreator(user);
+        if (CollectionUtils.isEmpty(queries)) {
+            LOG.info("No query found for this user");
+            return 0;
+        }
+
+        // 2. for each query, sync the db with CNIPR
+        for (Query query : queries) {
+            numbChanged += this.syncPatentsByQuery(query);
+        }
+        return numbChanged;
+    }
+
+    int syncPatentsByQuery(Query query) {
+        int totalCounts = syncManager.getTotalPatentsCountByQuery(query, controlParams);
+
+        int counts = 0;
+        for (int block = 0; block < (totalCounts / pageSize + 1); block++) {
+            controlParams.withFromIndex(block * pageSize);
+            controlParams.withToIndex((block + 1) * pageSize);
+            counts += syncManager.syncPatentsByQuery(query, controlParams);
+        }
+        LOG.info("Updated patent counts = {} for Query = {}", counts, query);
+        return counts;
     }
 
     public static void main(String[] args) {
@@ -76,8 +113,8 @@ public class CniprPatentSyncApp extends IpAppBase {
             if (cmd.hasOption("d")) {
                 app.setSourceDbs(cmd.getOptionValue("d"));
             }
-            if (cmd.hasOption("x")) {
-                app.setMaxReturns(Integer.parseInt(cmd.getOptionValue("x")));
+            if (cmd.hasOption("p")) {
+                app.setPageSize(Integer.parseInt(cmd.getOptionValue("p")));
             }
             if (!cmd.hasOption("u")) {
                 printUsage("CniprPatentSyncApp", options, System.out);
@@ -98,7 +135,7 @@ public class CniprPatentSyncApp extends IpAppBase {
         options.addOption("b", true, "(optional) base directory for JSON output file");
         options.addOption("u", true, "the user name (i.e the name for the IP applicant)");
         options.addOption("d", true, "(optional) the source databases (separated by [,])");
-        options.addOption("x", true, "(optional) the maximum returns for each search");
+        options.addOption("p", true, "(optional) the page size for each search");
 
         return options;
     }

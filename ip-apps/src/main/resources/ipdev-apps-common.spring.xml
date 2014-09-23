@@ -19,5 +19,6 @@
     
     <bean id="cniprSyncApp" class="com.ipdev.apps.patent.CniprPatentSyncApp">
         <property name="patentSyncManager" ref="cniprPatentSyncManager" />
+        <property name="queryDao" ref="queryDbDao" />
     </bean>
 </beans>

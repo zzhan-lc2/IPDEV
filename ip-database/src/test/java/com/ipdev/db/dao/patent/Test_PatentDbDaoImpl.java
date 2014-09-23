@@ -9,7 +9,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.ipdev.common.dao.patent.RequestControlParams;
 import com.ipdev.common.entity.patent.Patent;
 import com.ipdev.db.support.CreateDao;
 import com.ipdev.db.support.HibernateDaoUnitTestCase;
@@ -70,16 +70,15 @@ public class Test_PatentDbDaoImpl extends HibernateDaoUnitTestCase {
 
     @Test(dependsOnMethods = "test_save")
     public void test_findPatentsByApplicant() {
-        int maxReturns = 0;
         String applicantName = "Applicant2";
-        List<Patent> actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */null, maxReturns);
+        List<Patent> actual = dao.findPatentsByApplicant(applicantName, new RequestControlParams());
         Assert.assertEquals(actual.size(), 1);
 
-        actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */Sets.newHashSet("SRCDB2"), maxReturns);
+        actual = dao.findPatentsByApplicant(applicantName, new RequestControlParams().addSourceDb("SRCDB2"));
         Assert.assertEquals(actual.size(), 0);
 
         applicantName = "Applicant3";
-        actual = dao.findPatentsByApplicant(applicantName, /* sourceDbs= */null, maxReturns);
+        actual = dao.findPatentsByApplicant(applicantName, new RequestControlParams());
         Assert.assertEquals(actual.size(), 1);
         Assert.assertEquals(actual.get(0), patent2);
     }

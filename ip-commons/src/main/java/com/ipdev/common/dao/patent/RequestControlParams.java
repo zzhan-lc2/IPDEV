@@ -1,4 +1,4 @@
-package com.ipdev.common.manager;
+package com.ipdev.common.dao.patent;
 
 import java.util.Set;
 
@@ -10,14 +10,14 @@ public class RequestControlParams extends Request {
     private static final long serialVersionUID = 1L;
 
     Set<String> sourceDbs = Sets.newHashSet();
-    int maxResults; // 0 means no limit; if time & resource is precious, set reasonable value to limit the usage
+    int fromIndex = 0;
+    int toIndex;
     boolean forceUpdate; // if set to true, we will update the patents no matter if the status change or not
     OrderExp orderExp; // search return "order by" expression
     String fileBaseDir; // root directory for file-based storage
     boolean enableFileStorage; // flag to control if we want to turn on the file storage
 
     public RequestControlParams() {
-        maxResults = 0;
         forceUpdate = false;
         enableFileStorage = false;
     }
@@ -27,8 +27,13 @@ public class RequestControlParams extends Request {
         return this;
     }
 
-    public RequestControlParams withMaxResults(int maxResults) {
-        this.maxResults = maxResults;
+    public RequestControlParams withFromIndex(int fromIndex) {
+        this.fromIndex = fromIndex;
+        return this;
+    }
+
+    public RequestControlParams withToIndex(int toIndex) {
+        this.toIndex = toIndex;
         return this;
     }
 
@@ -56,8 +61,12 @@ public class RequestControlParams extends Request {
         return this.sourceDbs;
     }
 
-    public int getMaxResults() {
-        return this.maxResults;
+    public int getFromIndex() {
+        return this.fromIndex;
+    }
+
+    public int getToIndex() {
+        return this.toIndex;
     }
 
     public boolean getForceUpdate() {

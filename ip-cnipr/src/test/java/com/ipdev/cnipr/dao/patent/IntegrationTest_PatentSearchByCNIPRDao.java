@@ -1,7 +1,6 @@
 package com.ipdev.cnipr.dao.patent;
 
 import java.util.List;
-import java.util.Set;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -10,6 +9,7 @@ import org.testng.annotations.Test;
 import com.ipdev.cnipr.architect.IntegrationTestCniprCase;
 import com.ipdev.cnipr.query.AttrField;
 import com.ipdev.cnipr.utility.JsonCniprHelper;
+import com.ipdev.common.dao.patent.RequestControlParams;
 import com.ipdev.common.entity.patent.Patent;
 import com.ipdev.common.query.Operator;
 import com.ipdev.common.query.Query;
@@ -35,8 +35,17 @@ public class IntegrationTest_PatentSearchByCNIPRDao extends IntegrationTestCnipr
         Assert.assertEquals(actual.getPid(), pid);
     }
 
+    public void test_getTotalPatentsByQuery() {
+        Query query = new Query();
+        QueryExp exp = new QueryExp(AttrField.APPLICANT.getName(), "华为技术有限公司");
+        query.addExpression(exp);
+
+        int actual = dao.getTotalPatentsByQuery(query, null);
+        Assert.assertTrue(actual > 60000);
+    }
+
     public void test_findPatentsByQuery() {
-        Set<String> sourceDbs = null;
+        RequestControlParams controlParams = new RequestControlParams();
 
         Query query = new Query();
         QueryExp exp = new QueryExp();
@@ -49,7 +58,7 @@ public class IntegrationTest_PatentSearchByCNIPRDao extends IntegrationTestCnipr
         exp.setExpValue("20120901 to 20121002");
         query.addExpression(exp);
 
-        List<Patent> actual = dao.findPatentsByQuery(query, sourceDbs, null, 0);
+        List<Patent> actual = dao.findPatentsByQuery(query, controlParams);
         Assert.assertTrue(actual.size() > 1);
     }
 }
