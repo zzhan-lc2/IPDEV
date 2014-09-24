@@ -27,6 +27,7 @@ import org.apache.http.util.EntityUtils;
 import com.ipdev.common.IpdException;
 import com.ipdev.common.auth.AuthToken;
 import com.ipdev.common.auth.AuthTokenExpireException;
+import com.ipdev.common.metrics.ReportMetrics;
 import com.ipdev.common.net.HttpClientUtility;
 import com.ipdev.common.net.UserAgents;
 import com.ipdev.common.utility.json.GsonJsonHelper;
@@ -97,6 +98,7 @@ public class AuthTokenManager {
         return code;
     }
 
+    @ReportMetrics
     public synchronized final AuthToken getAuthToken() {
         if (StringUtils.isEmpty(authToken.getAccessToken())) {
             AuthToken tmpToken = readTokenFromLocalFile();

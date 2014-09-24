@@ -15,6 +15,7 @@ import com.ipdev.common.dao.patent.PatentSearchDao;
 import com.ipdev.common.dao.patent.PatentStorageDao;
 import com.ipdev.common.dao.patent.RequestControlParams;
 import com.ipdev.common.entity.patent.Patent;
+import com.ipdev.common.metrics.ReportMetrics;
 import com.ipdev.common.query.OrderExp;
 import com.ipdev.common.query.OrderExp.Direction;
 import com.ipdev.common.query.Query;
@@ -24,12 +25,14 @@ import com.ipdev.db.support.AbstractHibernateDao;
 @Transactional
 public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implements PatentStorageDao, PatentSearchDao {
 
+    @ReportMetrics
     public void save(Patent patent) {
         Preconditions.checkNotNull(patent, "patent cannot be null");
 
         super.save(sanitize(patent));
     }
 
+    @ReportMetrics
     public List<Patent> findPatentsByQuery(Query query, RequestControlParams controlParams) {
         Preconditions.checkNotNull(query, "query cannot be null");
         // TODO
@@ -40,6 +43,7 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         return this.findById(Patent.class, id);
     }
 
+    @ReportMetrics
     public List<Patent> findPatentsByApplicant(String applicantName, RequestControlParams controlParams) {
         Preconditions.checkNotNull(applicantName, "applicantName cannot be null");
 
@@ -84,6 +88,7 @@ public class PatentDbHibernateDao extends AbstractHibernateDao<Patent> implement
         return entity;
     }
 
+    @ReportMetrics
     public int getTotalPatentsByQuery(Query query, Set<String> sourceDbs) {
         // TODO Auto-generated method stub
         return 0;

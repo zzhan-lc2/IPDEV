@@ -78,4 +78,11 @@ public abstract class IntegrationTestCase {
             StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         return output;
     }
+
+    protected Path createTempOutputFilePath(String fileName) throws IOException {
+        String path = System.getProperty("java.io.tmpdir");
+        path = path + "/" + fileName;
+        System.out.println("Creating file: " + path);
+        return Paths.get(path);
+    }
 }

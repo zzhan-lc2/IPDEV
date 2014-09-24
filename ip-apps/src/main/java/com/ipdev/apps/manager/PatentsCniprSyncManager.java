@@ -75,7 +75,13 @@ public class PatentsCniprSyncManager implements PatentSyncManager {
                     continue;
                 }
 
-                patent = cniprDao.findPatentById(patent.getPid());
+                String pid = patent.getPid();
+                patent = cniprDao.findPatentById(pid);
+                if (patent == null) {
+                    LOG.error("Fail to get Patent detail from CNIPR for patent id:" + pid);
+                    continue;
+                }
+
                 if (controlParams.getEnableFileStorage()) {
                     this.fileStorageDao.save(patent);
                 }

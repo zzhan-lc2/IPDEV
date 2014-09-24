@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Preconditions;
+import com.ipdev.common.metrics.ReportMetrics;
 import com.ipdev.common.utility.json.GsonJsonHelper;
 import com.ipdev.common.utility.json.JsonHelper;
 
@@ -40,6 +41,7 @@ public class JsonFileDataRecorder implements PatentDataRecorder {
         return this.jsonHelper;
     }
 
+    @ReportMetrics
     public void record(URI storageUri, Object ObjectToRecord, boolean outputNulls) {
         Preconditions.checkNotNull(storageUri, "storageUri cannot be null");
         Preconditions.checkNotNull(ObjectToRecord, "ObjectToRecord cannot be null");

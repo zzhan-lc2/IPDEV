@@ -2,6 +2,7 @@ package com.ipdev.cnipr.dao.patent;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketException;
 import java.net.URI;
 import java.util.List;
 
@@ -19,6 +20,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import com.ipdev.common.DaoNetworkException;
+import com.ipdev.common.metrics.ReportMetrics;
 import com.ipdev.common.net.HttpClientUtility;
 import com.ipdev.common.net.HttpMethodsInterface;
 
@@ -62,6 +65,7 @@ public class HttpMethodsCNIPR implements HttpMethodsInterface {
     }
 
     @Override
+    @ReportMetrics
     public String post(String url, List<NameValuePair> nvps) {
         HttpClient httpclient = getHttpClient();
         HttpPost httppost = new HttpPost(url);
@@ -93,6 +97,7 @@ public class HttpMethodsCNIPR implements HttpMethodsInterface {
     }
 
     @Override
+    @ReportMetrics
     public String get(String url, List<NameValuePair> nvps) {
         HttpClient httpclient = getHttpClient();
 
@@ -107,8 +112,10 @@ public class HttpMethodsCNIPR implements HttpMethodsInterface {
             ss = EntityUtils.toString(entity, DEFAULT_CHARSET);
 
             EntityUtils.consume(entity);
+        } catch (SocketException e) {
+            throw new DaoNetworkException("Caught network socket exception:", e);
         } catch (Exception e) {
-            LOG.error("caught exception: " + e);
+            LOG.error("caught unexpected exception: " + e);
         } finally {
             releaseHttpClient(httpclient);
         }

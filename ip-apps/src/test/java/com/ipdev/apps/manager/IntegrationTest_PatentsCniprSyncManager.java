@@ -49,9 +49,9 @@ public class IntegrationTest_PatentsCniprSyncManager extends IntegrationTestAppC
         QueryExp exp = new QueryExp(AttrField.APPLICANT.getName(), "华为技术有限公司");
         query.addExpression(exp);
 
-        int start = 8000;
+        int start = 10000;
         params.withFromIndex(start);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             params.withFromIndex(start + i * pageSize)
                 .withToIndex(start + (i + 1) * pageSize);
             try {
