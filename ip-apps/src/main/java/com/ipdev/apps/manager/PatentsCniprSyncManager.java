@@ -115,4 +115,18 @@ public class PatentsCniprSyncManager implements PatentSyncManager {
         return cniprDao.getTotalPatentsByQuery(searchQuery, controlParams.getSourceDbs());
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Patent findPatentById(String patentId, boolean storeToDb) {
+        Patent patent = localSearchDao.findPatentById(patentId);
+        if (null == patent) {
+            patent = cniprDao.findPatentById(patentId);
+
+            if (storeToDb) {
+                dbStorageDao.save(patent);
+            }
+        }
+        return patent;
+    }
+
 }
